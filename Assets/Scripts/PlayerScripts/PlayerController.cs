@@ -6,29 +6,24 @@ namespace Asteroids
     public class PlayerController : MonoBehaviour, IInitiable
     {
         //connections
-        [SerializeField] private BulletPoolManager bulletPoolManager;
-        [SerializeField] private GameObject laser;
+        [SerializeField] private FireBullet fireBulletScript;
+        [SerializeField] private FireLaser fireLaserScript;
+        [SerializeField] private LaserVisual laserVisual;
+
 
         private PlayerControls playerControls;
         private Rigidbody2D rb;
         private SpriteRenderer spriteRenderer;
         private Camera mainCamera;
-        private bool isBulletRecharge;
-        private bool isLaserRecharge;
 
         private float moveInput;
         private float rotateInput;
         private float shootBulletInput;
-        private float shootLaserInput;
 
         //settings
         [SerializeField] private float rotationSpeed;
         [SerializeField] private float movementSpeed;
-        [SerializeField] private float rechargeTime;
-        [SerializeField] private float laserRechargeTime;
-        [SerializeField] private int numberOfLaserCharges;
 
-        private Coroutine laserCharging;
 
         public int sortingIndex { get; private set; } = 1;
 
@@ -37,6 +32,9 @@ namespace Asteroids
             rb = GetComponent<Rigidbody2D>();
             spriteRenderer = GetComponent<SpriteRenderer>();
             mainCamera = FindAnyObjectByType<Camera>();
+
+            LineRenderer lineRenderer = GetComponent<LineRenderer>();
+            laserVisual.SetLineRenderer(lineRenderer);
 
             playerControls = new PlayerControls();
             playerControls.Player.Enable();
@@ -48,43 +46,23 @@ namespace Asteroids
             playerControls.Player.ShootBullet.performed += context => shootBulletInput = 1f;
             playerControls.Player.ShootBullet.canceled += context => shootBulletInput = 0f;
 
-            playerControls.Player.ShootLaser.started += context => ShootLaser(); //realize in the method raucast and LineRenderer
-            playerControls.Player.ShootLaser.canceled += context => shootLaserInput = 0f;
+            playerControls.Player.ShootLaser.started += context => ShootLaser();
 
         }
 
         private void ShootLaser()
         {
+            fireLaserScript.Fire();
+            laserVisual.ShowLaserVisual();
         }
 
         private void Update()
         {
             //shooting
-            if (shootBulletInput > 0f && !isBulletRecharge)
+            if (shootBulletInput > 0f)
             {
-                StartCoroutine(Recharging());
-                GameObject bulletSpawn = bulletPoolManager.GetBullet();
-                if (bulletSpawn != null)
-                {
-                    bulletSpawn.transform.position = transform.position;
-                    bulletSpawn.transform.rotation = transform.rotation;
-                    bulletSpawn.SetActive(true);
-                }
+                fireBulletScript.Fire();
             }
-        }
-
-        private IEnumerator Recharging()
-        {
-            isBulletRecharge = true;
-            yield return new WaitForSeconds(rechargeTime);
-            isBulletRecharge = false;
-        }
-
-        private IEnumerator LaserCharging()
-        {
-            isLaserRecharge = true;
-            yield return new WaitForSeconds(laserRechargeTime);
-            isLaserRecharge = false;
         }
 
         private void FixedUpdate()
@@ -131,12 +109,6 @@ namespace Asteroids
                     transform.position = newPosition;
                 }
             }
-        }
-
-
-        private void OnDeath()
-        {
-            playerControls.Player.Disable();
         }
     }
 }

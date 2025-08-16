@@ -13,7 +13,9 @@ GameObject:
   - component: {fileID: 6622796616691350540}
   - component: {fileID: 2334258308639938663}
   - component: {fileID: -87764259963745147}
-  m_Layer: 9
+  - component: {fileID: 8081139580065058877}
+  - component: {fileID: -6583726807198072730}
+  m_Layer: 10
   m_Name: Ufo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -124,7 +126,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.006577909, y: -0.011276454}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -134,7 +136,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 0.64, y: 0.51}
+  m_Size: {x: 0.5554265, y: 0.43858236}
   m_EdgeRadius: 0
 --- !u!114 &2334258308639938663
 MonoBehaviour:
@@ -179,3 +181,38 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &8081139580065058877
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5821226311079335962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b16e30569c3be9e4fa5c540e231ef3d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  bulletPoolManager: {fileID: 0}
+  rechargeTime: 0
+--- !u!114 &-6583726807198072730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5821226311079335962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7dc3607fb33f5948aa956f837dd42ba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxLaserShoots: 0
+  currentLaserShoots: 0
+  rechargeTime: 0
+  laserDistance: 0
+  destructableLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  leftBound: {fileID: 0}
+  rightBound: {fileID: 0}

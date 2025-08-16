@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Asteroids
 {
-    public class UfoBehaviour : MonoBehaviour
+    public class UfoBehaviour : MonoBehaviour, IHaveDeathConditions
     {
         private Vector3 destination;
         private bool isReviveTime;
@@ -43,16 +43,21 @@ namespace Asteroids
         {
             if (!other.GetComponent<BulletBehaviour>()) return;
 
-            isReviveTime = true;
-            Vector2 spawnPlace = UtilsMakeRandomStartPosition.MakeRandomStartPosition();
-            transform.position = spawnPlace;
-            StartCoroutine(Revive());
+            DeathConditions();
         }
 
         private IEnumerator Revive()
         {
             yield return new WaitForSeconds(timeForRevive);
             isReviveTime = false;
+        }
+
+        public void DeathConditions()
+        {
+            isReviveTime = true;
+            Vector2 spawnPlace = UtilsMakeRandomStartPosition.MakeRandomStartPosition();
+            transform.position = spawnPlace;
+            StartCoroutine(Revive());
         }
     }
 }

@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Asteroids
 {
-    public class AsteroidSplitting : MonoBehaviour
+    public class AsteroidSplitting : MonoBehaviour, IHaveDeathConditions
     {
         private AsteroidPoolManager asteroidPoolManager;
 
@@ -26,17 +26,22 @@ namespace Asteroids
                     smallAsteroid.transform.position = transform.position;
                     smallAsteroid.SetActive(true);
                 }
-                asteroidPoolManager.ReturnAsteroid(gameObject);
+                DeathConditions();
             }
             else
             {
-                asteroidPoolManager.ReturnAsteroid(gameObject);
+                DeathConditions();
             }
         }
 
         public void SetPoolManager(AsteroidPoolManager manager)
         {
             asteroidPoolManager = manager;
+        }
+
+        public void DeathConditions()
+        {
+            asteroidPoolManager.ReturnAsteroid(gameObject);
         }
     }
 }
