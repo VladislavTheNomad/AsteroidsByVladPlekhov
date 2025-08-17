@@ -1,4 +1,3 @@
-using System.Collections;
 using UnityEngine;
 
 namespace Asteroids
@@ -9,32 +8,31 @@ namespace Asteroids
         [SerializeField] private FireBullet fireBulletScript;
         [SerializeField] private FireLaser fireLaserScript;
         [SerializeField] private LaserVisual laserVisual;
+        [SerializeField] private UIManager UIManager;
+        [SerializeField] private Camera mainCamera;
 
-
+        //own
         private PlayerControls playerControls;
         private Rigidbody2D rb;
-        private SpriteRenderer spriteRenderer;
-        private Camera mainCamera;
+        private LineRenderer lineRenderer;
 
         private float moveInput;
         private float rotateInput;
         private float shootBulletInput;
+        public int sortingIndex { get; private set; } = 1;
 
         //settings
         [SerializeField] private float rotationSpeed;
         [SerializeField] private float movementSpeed;
 
-
-        public int sortingIndex { get; private set; } = 1;
-
         public void Installation()
         {
             rb = GetComponent<Rigidbody2D>();
-            spriteRenderer = GetComponent<SpriteRenderer>();
-            mainCamera = FindAnyObjectByType<Camera>();
-
-            LineRenderer lineRenderer = GetComponent<LineRenderer>();
+            lineRenderer = GetComponent<LineRenderer>();
             laserVisual.SetLineRenderer(lineRenderer);
+
+            fireLaserScript.SetStartAmountOfShots();
+            fireLaserScript.SetAmountOfRechareTimers();
 
             playerControls = new PlayerControls();
             playerControls.Player.Enable();
@@ -47,13 +45,11 @@ namespace Asteroids
             playerControls.Player.ShootBullet.canceled += context => shootBulletInput = 0f;
 
             playerControls.Player.ShootLaser.started += context => ShootLaser();
-
         }
 
         private void ShootLaser()
         {
             fireLaserScript.Fire();
-            laserVisual.ShowLaserVisual();
         }
 
         private void Update()
@@ -72,42 +68,39 @@ namespace Asteroids
             if (moveInput > 0f)
             {
                 rb.AddForce(transform.up * movementSpeed, ForceMode2D.Force);
+                UIManager.UpdateSpeed(rb.linearVelocity.magnitude);
             }
-
         }
 
         private void LateUpdate()
         {
-            if (!spriteRenderer.isVisible)
+            //coordinates + rotation angle
+            Vector3 playerPositionInCameraCoordinates = mainCamera.WorldToViewportPoint(transform.position);
+            UIManager.UpdateCoordinates(playerPositionInCameraCoordinates, transform.eulerAngles.z);
+            if (playerPositionInCameraCoordinates.x < 0 || playerPositionInCameraCoordinates.x > 1 || playerPositionInCameraCoordinates.y > 0 || playerPositionInCameraCoordinates.y < 0)
             {
-                Vector3 playerPositionInCameraCoordinates = mainCamera.WorldToViewportPoint(transform.position);
                 Vector3 bottomLeft = mainCamera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
                 Vector3 topRight = mainCamera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
-
-                if (playerPositionInCameraCoordinates.x < 0 || playerPositionInCameraCoordinates.x > 1 || playerPositionInCameraCoordinates.y > 0 || playerPositionInCameraCoordinates.y < 0)
+                Vector3 newPosition = transform.position;
+                
+                if (playerPositionInCameraCoordinates.x > 1)
                 {
-                    Vector3 newPosition = transform.position;
-
-                    if (playerPositionInCameraCoordinates.x > 1)
-                    {
-                        newPosition.x = bottomLeft.x;
-                    }
-                    else if (playerPositionInCameraCoordinates.x < 0)
-                    {
-                        newPosition.x = topRight.x;
-                    }
-
-                    if (playerPositionInCameraCoordinates.y > 1)
-                    {
-                        newPosition.y = bottomLeft.y;
-                    }
-                    else if (playerPositionInCameraCoordinates.y < 0)
-                    {
-                        newPosition.y = topRight.y;
-                    }
-
-                    transform.position = newPosition;
+                    newPosition.x = bottomLeft.x;
                 }
+                else if (playerPositionInCameraCoordinates.x < 0)
+                {
+                    newPosition.x = topRight.x;
+                }
+                
+                if (playerPositionInCameraCoordinates.y > 1)
+                {
+                    newPosition.y = bottomLeft.y;
+                }
+                else if (playerPositionInCameraCoordinates.y < 0)
+                {
+                    newPosition.y = topRight.y;
+                }
+                transform.position = newPosition;
             }
         }
     }

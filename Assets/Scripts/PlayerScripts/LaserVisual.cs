@@ -5,6 +5,7 @@ namespace Asteroids
 {
     public class LaserVisual : MonoBehaviour
     {
+        //connections
         private LineRenderer lineRenderer;
 
         //settings
@@ -14,6 +15,7 @@ namespace Asteroids
 
         public void ShowLaserVisual()
         {
+            if (this == null || lineRenderer == null) return;
             StartCoroutine(LaserRoutine());
         }
 
@@ -28,6 +30,8 @@ namespace Asteroids
 
         private IEnumerator LaserRoutine()
         {
+            if (lineRenderer == null) yield break;
+
             lineRenderer.enabled = true;
 
             Vector3 start = transform.position;
@@ -39,6 +43,11 @@ namespace Asteroids
             yield return new WaitForSeconds(laserDuration);
 
             lineRenderer.enabled = false;
+        }
+
+        private void OnDestroy()
+        {
+            StopAllCoroutines();
         }
     }
 }

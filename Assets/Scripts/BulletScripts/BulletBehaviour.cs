@@ -5,6 +5,7 @@ namespace Asteroids
 {
     public class BulletBehaviour : MonoBehaviour
     {
+        //connections
         private BulletPoolManager bulletPoolManager;
 
         //settings
@@ -34,9 +35,10 @@ namespace Asteroids
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (!collision.GetComponent<AsteroidBehaviour>()) return;
-
-            bulletPoolManager.ReturnBullet(gameObject);
+            if (collision.GetComponent<AsteroidBehaviour>() || collision.GetComponent<UfoBehaviour>())
+            {
+                bulletPoolManager.ReturnBullet(gameObject);
+            }
         }
     }
 }

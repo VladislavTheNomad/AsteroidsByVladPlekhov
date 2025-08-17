@@ -5,18 +5,15 @@ namespace Asteroids
 {
     public class EntryPoint : MonoBehaviour
     {
-        private IInitiable[] initiables;
 
         private void Awake()
         {
-            initiables = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).Where(x => x is IInitiable).Select(x => x as IInitiable).OrderBy(x => x.sortingIndex).ToArray();
+            var initiables = Object.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<IInitiable>().OrderBy(x=> x.sortingIndex);
 
             foreach (var initiable in initiables)
             {
                 initiable.Installation();
             }
         }
-
-     
     }
 }

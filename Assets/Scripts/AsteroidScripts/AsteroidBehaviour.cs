@@ -4,6 +4,7 @@ namespace Asteroids
 {
     public class AsteroidBehaviour : MonoBehaviour
     {
+        //own
         private AsteroidPoolManager asteroidPoolManager;
         private Camera mainCamera;
         private Vector3 destination;
@@ -18,18 +19,13 @@ namespace Asteroids
         private void OnEnable()
         {
             mainCamera = Camera.main;
-
-            Vector2 bottomLeft = mainCamera.ViewportToWorldPoint(new Vector2(0, 0));
-            Vector2 topRight = mainCamera.ViewportToWorldPoint(new Vector2(1, 1));
+            Vector2 bottomLeft = mainCamera.ViewportToWorldPoint(Vector2.zero);
+            Vector2 topRight = mainCamera.ViewportToWorldPoint(Vector2.one);
 
             Vector3 targetPoint = new Vector3(Random.Range(bottomLeft.x, topRight.x), Random.Range(bottomLeft.y, topRight.y), 0);
-
             destination = (targetPoint - transform.position).normalized;
-            if (!isBigOne)
-            {
-                moveSpeed = Random.Range(minMoveSpeed * acceleration, maxMoveSpeed * acceleration);
-            }
-            else { moveSpeed = Random.Range(minMoveSpeed, maxMoveSpeed); }
+
+            moveSpeed = isBigOne ? Random.Range(minMoveSpeed, maxMoveSpeed) : Random.Range(minMoveSpeed * acceleration, maxMoveSpeed * acceleration);
         }
 
 
@@ -43,11 +39,11 @@ namespace Asteroids
                 asteroidPoolManager.ReturnAsteroid(gameObject);
             }
         }
+
         public void SetPoolManager(AsteroidPoolManager manager)
         {
             asteroidPoolManager = manager;
         }
-
         public void SetBigForm() => isBigOne = true;
         public void RemoveBigForm() => isBigOne = false;
 

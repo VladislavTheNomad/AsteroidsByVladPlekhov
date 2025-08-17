@@ -5,15 +5,17 @@ namespace Asteroids
 {
     public class BulletPoolManager : MonoBehaviour, IInitiable
     {
+        //settings
         [SerializeField] private GameObject bulletPrefab;
         [SerializeField] private int numOfBulletInPool;
 
+        //own
         private List<GameObject> bulletPool;
         public int sortingIndex => 2;
 
         public void Installation()
         {
-            bulletPool = new List<GameObject>();
+            bulletPool = new List<GameObject>(numOfBulletInPool);
             for (int i = 0; i < numOfBulletInPool; i++)
             {
                 GameObject newBullet = Instantiate(bulletPrefab, transform.position, transform.rotation);

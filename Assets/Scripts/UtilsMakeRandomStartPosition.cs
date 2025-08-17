@@ -4,11 +4,12 @@ namespace Asteroids
 {
     public static class UtilsMakeRandomStartPosition
     {
+
         public static Vector2 MakeRandomStartPosition()
         {
             Camera mainCamera = Camera.main;
-            Vector2 bottomLeft = mainCamera.ViewportToWorldPoint(new Vector2(0, 0));
-            Vector2 topRight = mainCamera.ViewportToWorldPoint(new Vector2(1, 1));
+            Vector2 bottomLeft = mainCamera.ViewportToWorldPoint(Vector2.zero);
+            Vector2 topRight = mainCamera.ViewportToWorldPoint(Vector2.one);
             float widthScreen = topRight.x - bottomLeft.x;
             float heightScreen = topRight.y - bottomLeft.y;
 

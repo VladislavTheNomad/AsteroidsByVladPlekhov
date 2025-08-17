@@ -22,8 +22,7 @@ namespace Asteroids
                 GameObject bulletSpawn = bulletPoolManager.GetBullet();
                 if (bulletSpawn != null)
                 {
-                    bulletSpawn.transform.position = transform.position;
-                    bulletSpawn.transform.rotation = transform.rotation;
+                    bulletSpawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
                     bulletSpawn.SetActive(true);
                 }
             }
@@ -35,6 +34,5 @@ namespace Asteroids
             yield return new WaitForSeconds(rechargeTime);
             isBulletRecharge = false;
         }
-
     }
 }

@@ -8,23 +8,27 @@ namespace Asteroids
         //connections
         [SerializeField] private GameObject asteroidPrefab;
         [SerializeField] private int numOfAsteroidsInPool;
-        [SerializeField] private Camera mainCamera;
+        [SerializeField] private UIManager uiManager;
 
+        //own
         private List<GameObject> asteroidsPool;
+        private Camera mainCamera;
         public int sortingIndex => 4;
 
         public void Installation()
         {
-            asteroidsPool = new List<GameObject>();
+            mainCamera = Camera.main;
+            asteroidsPool = new List<GameObject>(numOfAsteroidsInPool);
             for (int i = 0; i < numOfAsteroidsInPool; i++)
             {
                 GameObject newAsteroid = Instantiate(asteroidPrefab);
                 newAsteroid.SetActive(false);
 
                 var asteroidScript = newAsteroid.GetComponent<AsteroidBehaviour>();
-                var asteroidSlitting = newAsteroid.GetComponent<AsteroidSplitting>();
+                var asteroidSplitting = newAsteroid.GetComponent<AsteroidSplitting>();
                 asteroidScript.SetPoolManager(this);
-                asteroidSlitting.SetPoolManager(this);
+                asteroidSplitting.SetPoolManager(this);
+                asteroidSplitting.SetUIManager(uiManager);
 
                 asteroidsPool.Add(newAsteroid);
             }
@@ -32,7 +36,8 @@ namespace Asteroids
 
         public GameObject GetAsteroid()
         {
-            for (int i = 0; i < asteroidsPool.Count; i++)
+            int count = asteroidsPool.Count;
+            for (int i = 0; i < count; i++)
             {
                 if (!asteroidsPool[i].activeSelf)
                 {

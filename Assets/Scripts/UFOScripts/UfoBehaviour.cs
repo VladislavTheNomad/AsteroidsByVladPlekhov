@@ -5,6 +5,11 @@ namespace Asteroids
 {
     public class UfoBehaviour : MonoBehaviour, IHaveDeathConditions
     {
+        // connections
+        [SerializeField] private PlayerController player;
+        [SerializeField] private UIManager uiManager;
+
+        //own
         private Vector3 destination;
         private bool isReviveTime;
 
@@ -12,8 +17,6 @@ namespace Asteroids
         [SerializeField] private float moveSpeed;
         [SerializeField] private float gapBetweenPositionChanging;
         [SerializeField] private float timeForRevive;
-        [SerializeField] private PlayerController player;
-
 
         private void OnEnable()
         {
@@ -58,6 +61,12 @@ namespace Asteroids
             Vector2 spawnPlace = UtilsMakeRandomStartPosition.MakeRandomStartPosition();
             transform.position = spawnPlace;
             StartCoroutine(Revive());
+            uiManager.UpdateScore(1);
+        }
+
+        public void SetUIManager(UIManager UImanager)
+        {
+            uiManager = UImanager;
         }
     }
 }

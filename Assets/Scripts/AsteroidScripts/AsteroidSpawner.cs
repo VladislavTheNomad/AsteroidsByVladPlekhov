@@ -5,25 +5,22 @@ namespace Asteroids
 {
     public class AsteroidSpawner : MonoBehaviour, IInitiable
     {
+        //own
         public int sortingIndex => 5;
-        private PlayerController player;
 
         //settings
         [SerializeField] private float timeBetweenSpawns;
         [SerializeField] private AsteroidPoolManager poolManager;
+        [SerializeField] private PlayerController player;
 
         public void Installation()
         {
-            player = FindAnyObjectByType<PlayerController>();
-            if (player != null)
-            {
-                StartCoroutine(Spawn());
-            }
+            StartCoroutine(Spawn());
         }
 
         private IEnumerator Spawn()
         {
-            while (player != null)
+            while (true)
             {
                 yield return new WaitForSeconds(timeBetweenSpawns);
                 GameObject newAsteroid = poolManager.GetAsteroid();
@@ -37,9 +34,8 @@ namespace Asteroids
                 {
                     asteroidBehaviour.SetBigForm();
                 }
-                newAsteroid.transform.localScale = new Vector3(1f, 1f, 1f);
+                newAsteroid.transform.localScale = Vector3.one;
                 newAsteroid.SetActive(true);
-
             }
         }
     }

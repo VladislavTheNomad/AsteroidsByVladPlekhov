@@ -1,5 +1,3 @@
-using UnityEngine;
-
 namespace Asteroids
 {
     public interface IInitiable

@@ -4,5 +4,4 @@ namespace Asteroids
     {
         public void DeathConditions();
     }
-
 }
