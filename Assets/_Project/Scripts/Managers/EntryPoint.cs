@@ -1,27 +1,20 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Zenject;
 
 namespace Asteroids
 {
     public class EntryPoint : MonoBehaviour
     {
-        private const int STORAGE_OF_INITIABLES_LIST = 8;
-
-        [SerializeField] private GameObject _initializablesList;
-
         private List<IInitiable> _initializables;
 
-        private void Awake()
+        [Inject]
+        public void Construct(List<IInitiable> initializables)
         {
-            SetupInitializables();
-        }
-
-        private void SetupInitializables()
-        {
-            _initializables = new List<IInitiable>(STORAGE_OF_INITIABLES_LIST);
-            _initializables.AddRange(_initializablesList.GetComponentsInChildren<IInitiable>());
+            _initializables = initializables;
             InitializeGame();
         }
+
         private void InitializeGame()
         {
             foreach (var item in _initializables)

@@ -197,7 +197,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxLaserShoots: 0
   _rechargeTime: 0
-  _laserDistance: 0
   _destructableLayers:
     serializedVersion: 2
     m_Bits: 0
