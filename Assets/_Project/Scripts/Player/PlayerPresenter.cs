@@ -21,6 +21,8 @@ namespace Asteroids
 
         [SerializeField, Range(10, 100)] private float _rotationSpeed;
         [SerializeField, Range(1, 20)] private float _movementSpeed;
+        [SerializeField, Range(0, 1)] private float _bulletRechargeTime = 0.3f;
+        [SerializeField, Range(1, 30)] private float _laserRechargeTime = 10f;
         [SerializeField] private GameObject _leftBound;
         [SerializeField] private GameObject _rightBound;
         [SerializeField] private LayerMask _destructableLayers;
@@ -82,6 +84,9 @@ namespace Asteroids
         {
             _bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector3(0, 0, _view.transform.position.z));
             _topRight = _mainCamera.ViewportToWorldPoint(new Vector3(1, 1, _view.transform.position.z));
+
+            _model.SetBulletRechargeTime(_bulletRechargeTime);
+            _model.SetLaserRechargeTime(_laserRechargeTime);
         }
 
         public void AddTorque(float input)
@@ -126,7 +131,7 @@ namespace Asteroids
         private IEnumerator RechargeBullet()
         {
             _model.SetCanFireBullet(false);
-            yield return new WaitForSeconds(_model.BulletRechargeTime);
+            yield return new WaitForSeconds(_bulletRechargeTime);
             _model.SetCanFireBullet(true);
         }
 

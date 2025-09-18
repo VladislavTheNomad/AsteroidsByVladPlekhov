@@ -89,7 +89,7 @@ namespace Asteroids
 
         public void SpawnBullet()
         {
-            BulletBehaviour bulletSpawn = _gamePoolsController.GetBulletPool().Get();
+            BulletPresenter bulletSpawn = _gamePoolsController.GetBulletPool().Get();
             bulletSpawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
             bulletSpawn.gameObject.SetActive(true);
         }

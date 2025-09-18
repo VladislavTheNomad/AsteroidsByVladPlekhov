@@ -79,9 +79,9 @@ namespace Asteroids
                 }
             }
 
-            if (newObject.TryGetComponent<BulletBehaviour>(out var bulletScript))
+            if (newObject.TryGetComponent<BulletPresenter>(out var bulletScript))
             {
-                if (this is PoolManager<BulletBehaviour> bulletPool)
+                if (this is PoolManager<BulletPresenter> bulletPool)
                 {
                     bulletScript.Initialize();
                     bulletScript.OnDeath += HandleRetrnToPool;

@@ -30,7 +30,7 @@ namespace Asteroids
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.GetComponent<BulletBehaviour>()) return;
+            if (!other.GetComponent<BulletView>()) return;
             DeathConditions();
         }
 

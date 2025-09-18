@@ -13,7 +13,7 @@ namespace Asteroids
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.GetComponent<BulletBehaviour>()) return;
+            if (!other.GetComponent<BulletView>()) return;
             if (_asteroidBehaviour._asteroidCurrentSizeLevel > 1)
             {
                 for (int i = 0; i < NUMBER_OF_SMALL_ASTEROIDS; i++)

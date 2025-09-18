@@ -12,7 +12,7 @@ namespace Asteroids
         [SerializeField] private GameObject _player;
 
         private PoolManager<AsteroidBehaviour> _asteroidPool;
-        private PoolManager<BulletBehaviour> _bulletPool;
+        private PoolManager<BulletPresenter> _bulletPool;
         private PoolManager<UfoBehaviour> _ufoPool;
         private DiContainer _container;
 
@@ -30,12 +30,12 @@ namespace Asteroids
         public void Initialize()
         {
             _asteroidPool = new PoolManager<AsteroidBehaviour>(_prefabAsteroid, _poolSize, _player, _container);
-            _bulletPool = new PoolManager<BulletBehaviour>(_prefabBullet, _poolSize, _player, _container);
+            _bulletPool = new PoolManager<BulletPresenter>(_prefabBullet, _poolSize, _player, _container);
             _ufoPool = new PoolManager<UfoBehaviour>(_prefabUFO, _poolSize, _player, _container);
         }
 
         public PoolManager<AsteroidBehaviour> GetAsteroidPool() => _asteroidPool;
-        public PoolManager<BulletBehaviour> GetBulletPool() => _bulletPool;
+        public PoolManager<BulletPresenter> GetBulletPool() => _bulletPool;
         public PoolManager<UfoBehaviour> GetUFOPool() => _ufoPool;
     }
 }

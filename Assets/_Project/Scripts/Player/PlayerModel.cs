@@ -21,8 +21,6 @@ namespace Asteroids
             Rotation = 0f;
             Speed = 0f;
             LaserShots = MAX_LASER_SHOTS;
-            BulletRechargeTime = 0.3f;
-            LaserRechargeTime = 10f;
             CanFireBullet = true;
             LaserRechargeTimers = new float[MAX_LASER_SHOTS];
             for (int i = 0; i < LaserRechargeTimers.Length; i++)
@@ -78,5 +76,7 @@ namespace Asteroids
         }
 
         public int GetMaxLaserShots() => MAX_LASER_SHOTS;
+        public float SetBulletRechargeTime(float num) => BulletRechargeTime;
+        public float SetLaserRechargeTime(float num) => LaserRechargeTime;
     }
 }
