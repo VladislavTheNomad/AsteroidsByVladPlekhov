@@ -1,8 +1,9 @@
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class UtilsCalculatePositions : MonoBehaviour, IInitiable
+    public class UtilsCalculatePositions : IInitializable
     {
         private const int NUMBER_OF_SCREEN_SIDES = 4;
         private const int SPAWN_OFFSET = 10;
@@ -13,9 +14,13 @@ namespace Asteroids
         private float _widthScreen;
         private float _heightScreen;
 
-        public void Installation()
+        public UtilsCalculatePositions(Camera camera)
         {
-            _camera = Camera.main;
+            _camera = camera;
+        }
+
+        public void Initialize()
+        {
             _bottomLeft = _camera.ViewportToWorldPoint(Vector2.zero);
             _topRight = _camera.ViewportToWorldPoint(Vector2.one);
             _widthScreen = _topRight.x - _bottomLeft.x;

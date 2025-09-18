@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
@@ -17,7 +18,14 @@ namespace Asteroids
         [SerializeField] private LayerMask _destructableLayers;
         [SerializeField] private GameObject _leftBound;
         [SerializeField] private GameObject _rightBound;
-        [SerializeField] private LaserVisual _laserVisual;
+
+        private LaserVisual _laserVisual;
+
+        [Inject]
+        public void Construct(LaserVisual lv)
+        {
+            _laserVisual = lv;
+        }
 
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 

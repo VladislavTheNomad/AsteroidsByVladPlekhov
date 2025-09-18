@@ -1,5 +1,8 @@
 using System.Collections.Generic;
+using System.Drawing;
 using UnityEngine;
+using Zenject;
+using Zenject.SpaceFighter;
 
 namespace Asteroids
 {
@@ -10,18 +13,20 @@ namespace Asteroids
         private UIManager _uiManager;
         private List<T> _inactiveObjectsPool;
         private List<T> _activeObjectsPool;
-        private Camera _camera;
         private GameObject _playerObject;
         private UtilsCalculatePositions _calculatePositions;
+        private DiContainer _container;
+        private List<Component> _subsribedComponents = new List<Component>();
 
-        public void Installation(GameObject prefab, int size, UIManager manager, Camera camera, GameObject player, UtilsCalculatePositions _utilsCalculatePositions)
+        public PoolManager(GameObject prefab, int size, GameObject player, DiContainer container)
         {
             _objectPrefab = prefab;
             _poolSize = size;
-            _uiManager = manager;
-            _camera = camera;
             _playerObject = player;
-            _calculatePositions = _utilsCalculatePositions;
+
+            _container = container;
+            _uiManager = _container.TryResolve<UIManager>();
+            _calculatePositions = _container.TryResolve<UtilsCalculatePositions>();
 
             _inactiveObjectsPool = new List<T>(_poolSize);
             _activeObjectsPool = new List<T>(_poolSize);
@@ -55,16 +60,13 @@ namespace Asteroids
             _inactiveObjectsPool.Add(returnedObject);
         }
 
-        public Camera GetCamera()
-        {
-            return _camera;
-        }
-
         private void AddNewObjectInPool()
         {
             GameObject newObject = GameObject.Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
-            newObject.SetActive(false);
             T component = newObject.GetComponent<T>();
+
+            _container.InjectGameObject(newObject);
+            newObject.SetActive(false);
 
             if (newObject.TryGetComponent<AsteroidBehaviour>(out AsteroidBehaviour asteroidScript))
             {
@@ -72,7 +74,8 @@ namespace Asteroids
                 {
                     asteroidScript.Initialize(asteroidPool, _calculatePositions);
                     _uiManager.SubscribeOnDeath(asteroidScript);
-                    asteroidScript.OnDeathReturnToPool += obj => Return((T)(object)obj);
+                    asteroidScript.OnDeath += HandleRetrnToPool;
+                    _subsribedComponents.Add(asteroidScript);
                 }
             }
 
@@ -81,7 +84,8 @@ namespace Asteroids
                 if (this is PoolManager<BulletBehaviour> bulletPool)
                 {
                     bulletScript.Initialize();
-                    bulletScript.OnDeathReturnToPool += obj => Return((T)(object)obj);
+                    bulletScript.OnDeath += HandleRetrnToPool;
+                    _subsribedComponents.Add(bulletScript);
                 }
             }
 
@@ -91,11 +95,41 @@ namespace Asteroids
                 {
                     ufoScript.Initialize(_playerObject);
                     _uiManager.SubscribeOnDeath(ufoScript);
-                    ufoScript.OnDeathReturnToPool += obj => Return((T)(object)obj);
+                    ufoScript.OnDeath += HandleRetrnToPool;
+                    _subsribedComponents.Add(ufoScript);
                 }
             }
 
             _inactiveObjectsPool.Add(component);
+        }
+
+        private void HandleRetrnToPool(Component obj)
+        {
+            Return((T)(object)obj);
+        }
+
+        public void ClearPool()
+        {
+            _inactiveObjectsPool.Clear();
+            _activeObjectsPool.Clear();
+
+            foreach (var comp in _subsribedComponents)
+            {
+                if (comp == null) continue;
+
+                if (comp is AsteroidBehaviour asteroidBehComp)
+                {
+                    asteroidBehComp.OnDeath -= HandleRetrnToPool;
+                }
+                else if (comp is UfoBehaviour ufoBehComp)
+                {
+                    ufoBehComp.OnDeath -= HandleRetrnToPool;
+                }
+                else if (comp is BulletBehaviour bulletBehComp)
+                {
+                    bulletBehComp.OnDeath -= HandleRetrnToPool;
+                }
+            }
         }
     }
 }

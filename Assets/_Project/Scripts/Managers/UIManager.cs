@@ -1,12 +1,14 @@
+using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Asteroids
 {
-    public class UIManager : MonoBehaviour, IInitiable
+    public class UIManager : MonoBehaviour, IInitializable
     {
         private const int INITIAL_SCORE = 0;
         private const float TIME_SCALE_PAUSED = 0f;
@@ -17,8 +19,6 @@ namespace Asteroids
         private const int DECIMAL_PLACES_ANGLE = 1;
         private const int DECIMAL_PLACES_SPEED = 1;
 
-        [SerializeField] private CheckDeathConditions _playerDeadConditions;
-        [SerializeField] private FireLaser _playerLaser;
         [SerializeField] private GameObject _gameOverMenu;
         [SerializeField] private TextMeshProUGUI _coordinatesText;
         [SerializeField] private TextMeshProUGUI _angleText;
@@ -30,22 +30,32 @@ namespace Asteroids
         [SerializeField] private Button _quitButton;
 
         private int _score = INITIAL_SCORE;
+        private PlayerPresenter _playerPresenter;
+        private PlayerModel _playerModel;
+
+        [Inject]
+        public void Constructor(PlayerPresenter pp, PlayerModel pm)
+        {
+            _playerPresenter = pp;
+            _playerModel = pm;
+
+        }
 
         private void OnDisable()
         {
             _retryButton.onClick.RemoveListener(RetryButtonClick);
             _quitButton.onClick.RemoveListener(QuitButtonClick);
 
-            _playerDeadConditions.OnPlayerIsDead -= PlayerIsDead;
-            _playerLaser.OnAmountLaserShotChange -= UpdateCurrentShot;
-            _playerLaser.OnRechargeTimer -= UpdateRechargeTimer;
+            _playerPresenter.OnPlayerIsDead -= PlayerIsDead;
+            _playerPresenter.OnAmountLaserShotChange -= UpdateCurrentShot;
+            _playerPresenter.OnRechargeTimer -= UpdateRechargeTimer;
         }
 
-        public void Installation()
+        public void Initialize()
         {
-            _playerDeadConditions.OnPlayerIsDead += PlayerIsDead;
-            _playerLaser.OnAmountLaserShotChange += UpdateCurrentShot;
-            _playerLaser.OnRechargeTimer += UpdateRechargeTimer;
+            _playerPresenter.OnPlayerIsDead += PlayerIsDead;
+            _playerPresenter.OnAmountLaserShotChange += UpdateCurrentShot;
+            _playerPresenter.OnRechargeTimer += UpdateRechargeTimer;
 
             UpdateCurrentShot();
 
@@ -88,7 +98,7 @@ namespace Asteroids
 
         private void UpdateRechargeTimer()
         {
-            float[] timers = _playerLaser.CurrentRechargeTimers.Where(t => t > TIMER_THRESHOLD).ToArray();
+            float[] timers = _playerModel.LaserRechargeTimers.Where(t => t > TIMER_THRESHOLD).ToArray();
             if (timers.Length > 0)
             {
                 float minRechargeCooldown = timers.Min();
@@ -102,7 +112,7 @@ namespace Asteroids
 
         private void UpdateCurrentShot()
         {
-            _laserShotsText.text = $"{_playerLaser.CurrentLaserShoots} / {_playerLaser.GetMaxShots()}";
+            _laserShotsText.text = $"{_playerModel.LaserShots} / {_playerModel.GetMaxLaserShots()}";
         }
 
         private void RetryButtonClick()

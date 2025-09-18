@@ -1,14 +1,21 @@
 using System.Collections;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
     public class FireBullet : MonoBehaviour
     {
-        [SerializeField] private GamePoolsController _gamePoolsController;
         [SerializeField, Range(0.1f, 5f)] private float _rechargeTime = 0.5f;
 
         private bool _canFire;
+        private GamePoolsController _gamePoolsController;
+
+        [Inject]
+        public void Constuct(GamePoolsController gpc)
+        {
+            _gamePoolsController = gpc;
+        }
 
         public void ShootBullet()
         {

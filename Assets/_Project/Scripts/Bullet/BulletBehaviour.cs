@@ -4,9 +4,9 @@ using UnityEngine;
 
 namespace Asteroids
 {
-    public class BulletBehaviour : MonoBehaviour, IHaveDeathConditions, IPoolable<BulletBehaviour>
+    public class BulletBehaviour : MonoBehaviour, IHaveDeathConditions
     {
-        public event Action<BulletBehaviour> OnDeathReturnToPool;
+        public event Action<BulletBehaviour> OnDeath;
 
         [SerializeField] private float _bulletsLifeTime;
         [SerializeField] private float _moveSpeed;
@@ -45,7 +45,7 @@ namespace Asteroids
         {
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
-            OnDeathReturnToPool.Invoke(this);
+            OnDeath?.Invoke(this);
         }
 
         private IEnumerator LifeTime()

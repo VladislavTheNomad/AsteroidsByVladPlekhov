@@ -1,22 +1,15 @@
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerController : MonoBehaviour, IInitiable
+    public class PlayerController : MonoBehaviour, IInitializable
     {
-        private const float SCREEN_RIGHT_BOUND = 1f;
-        private const float SCREEN_LEFT_BOUND = 0f;
-        private const float SCREEN_TOP_BOUND = 1f;
-        private const float SCREEN_BOTTOM_BOUND = 0f;
+        private const float SCREEN_RIGHT_BOUND = 1.1f;
+        private const float SCREEN_LEFT_BOUND = -0.1f;
+        private const float SCREEN_TOP_BOUND = 1.1f;
+        private const float SCREEN_BOTTOM_BOUND = -0.1f;
 
-        [SerializeField] private GameObject _playerObject;
-        [SerializeField] private FireBullet _fireBulletScript;
-        [SerializeField] private FireLaser _fireLaserScript;
-        [SerializeField] private LaserVisual _laserVisual;
-        [SerializeField] private UIManager _uiManager;
-        [SerializeField] private Camera _mainCamera;
-        [SerializeField] private Rigidbody2D _rb;
-        [SerializeField] private LineRenderer _lineRenderer;
         [SerializeField, Range(10, 100)] private float _rotationSpeed;
         [SerializeField, Range(1, 20)] private float _movementSpeed;
 
@@ -27,17 +20,34 @@ namespace Asteroids
         private float _shootBulletInput;
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
+        private UIManager _uiManager;
+        private Camera _mainCamera;
+
+        private GameObject _playerObject;
+        private LaserVisual _laserVisual;
+        private FireLaser _fireLaser;
+        private FireBullet _fireBullet;
+        private Rigidbody2D _rb;
+        private LineRenderer _lineRenderer;
+
+        [Inject]
+        public void Construct(UIManager uiManager, Camera mainCamera, GameObject playerObject)
+        {
+            _uiManager = uiManager;
+            _mainCamera = mainCamera;
+            _playerObject = playerObject;
+        }
 
         private void OnDisable()
         {
-            _playerControls.Player.Disable();
+            _playerControls?.Player.Disable();
         }
 
         private void Update()
         {
             if (_shootBulletInput > 0f)
             {
-                _fireBulletScript.ShootBullet();
+                _fireBullet.ShootBullet();
             }
         }
 
@@ -86,14 +96,18 @@ namespace Asteroids
             }
         }
 
-        public void Installation()
+        public void Initialize()
         {
-            _laserVisual.SetLineRenderer(_lineRenderer);
-
-            _fireLaserScript.SetStartAmountOfShots();
-            _fireLaserScript.SetAmountOfRechargeTimers();
-
+            _laserVisual = _playerObject.GetComponent<LaserVisual>();
+            _fireLaser = _playerObject.GetComponent<FireLaser>();
+            _fireBullet = _playerObject.GetComponent<FireBullet>();
+            _rb = _playerObject.GetComponent<Rigidbody2D>();
+            _lineRenderer = _playerObject.GetComponent<LineRenderer>();
             _transform = _playerObject.transform;
+
+            _laserVisual.SetLineRenderer();
+            _fireLaser.SetStartAmountOfShots();
+            _fireLaser.SetAmountOfRechargeTimers();
 
             _bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector3(0, 0, _transform.position.z));
             _topRight = _mainCamera.ViewportToWorldPoint(new Vector3(1, 1, _transform.position.z));
@@ -113,7 +127,7 @@ namespace Asteroids
 
         private void ShootLaser()
         {
-            _fireLaserScript.Fire();
+            _fireLaser.Fire();
         }
     }
 }

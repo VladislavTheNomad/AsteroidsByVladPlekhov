@@ -4,12 +4,12 @@ using UnityEngine;
 
 namespace Asteroids
 {
-    public class UfoBehaviour : MonoBehaviour, IHaveDeathConditions, IPoolable<UfoBehaviour>, IGetPointsOnDestroy
+    public class UfoBehaviour : MonoBehaviour, IHaveDeathConditions, IGetPointsOnDestroy
     {
         private const int SCORE_POINTS = 1;
 
         public event Action<int> OnDeathTakeScore;
-        public event Action<UfoBehaviour> OnDeathReturnToPool;
+        public event Action<UfoBehaviour> OnDeath;
 
         [SerializeField] private float _moveSpeed;
         [SerializeField] private float _gapBetweenPositionChanging;
@@ -17,20 +17,15 @@ namespace Asteroids
         private Vector3 _destination;
         private GameObject playerObject;
         private Rigidbody2D _rb;
-        private bool _isInitialized;
-        private Coroutine _moveCoroutine;
+
+        private void OnEnable()
+        {
+            StartCoroutine(MoveBehaviour());
+        }
 
         private void OnDisable()
         {
             StopAllCoroutines();
-        }
-
-        private void Update()
-        {
-            if (gameObject.activeSelf && _isInitialized && _moveCoroutine == null)
-            {
-                _moveCoroutine = StartCoroutine(MoveBehaviour());
-            }
         }
 
         private void OnTriggerEnter2D(Collider2D other)
@@ -43,13 +38,12 @@ namespace Asteroids
         {
             playerObject = player;
             _rb = GetComponent<Rigidbody2D>();
-            _isInitialized = true;
         }
 
         public void DeathConditions()
         {
-            OnDeathReturnToPool.Invoke(this);
-            OnDeathTakeScore.Invoke(SCORE_POINTS);
+            OnDeath?.Invoke(this);
+            OnDeathTakeScore?.Invoke(SCORE_POINTS);
         }
 
         private IEnumerator MoveBehaviour()

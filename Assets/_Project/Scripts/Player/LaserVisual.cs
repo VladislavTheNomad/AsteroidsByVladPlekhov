@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
@@ -11,15 +12,20 @@ namespace Asteroids
 
         private LineRenderer _lineRenderer;
 
+        [Inject]
+        public void Construct(LineRenderer lineRenderer)
+        {
+            _lineRenderer = lineRenderer;  
+        }
+
         public void ShowLaserVisual()
         {
             if (_lineRenderer == null) return;
             StartCoroutine(LaserRoutine());
         }
 
-        public void SetLineRenderer(LineRenderer lr)
+        public void SetLineRenderer()
         {
-            _lineRenderer = lr;
             _lineRenderer.enabled = false;
             _lineRenderer.positionCount = 2;
             _lineRenderer.startWidth = LASER_WIDTH;

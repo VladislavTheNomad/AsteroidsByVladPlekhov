@@ -181,8 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b16e30569c3be9e4fa5c540e231ef3d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gamePoolsController: {fileID: 0}
-  _rechargeTime: 0.1
+  _rechargeTime: 0.3
 --- !u!114 &2121079444197918615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -195,14 +194,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7dc3607fb33f5948aa956f837dd42ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxLaserShoots: 0
-  _rechargeTime: 0
+  _maxLaserShoots: 3
+  _rechargeTime: 10
   _destructableLayers:
     serializedVersion: 2
     m_Bits: 0
-  _leftBound: {fileID: 0}
-  _rightBound: {fileID: 0}
-  _laserVisual: {fileID: 0}
+  _leftBound: {fileID: 8048606698523735766}
+  _rightBound: {fileID: 7686081493859471643}
 --- !u!114 &-5038419196129152304
 MonoBehaviour:
   m_ObjectHideFlags: 0

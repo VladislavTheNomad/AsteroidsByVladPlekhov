@@ -1,12 +1,13 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class AsteroidBehaviour : MonoBehaviour, IHaveDeathConditions, IPoolable<AsteroidBehaviour>, IGetPointsOnDestroy
+    public class AsteroidBehaviour : MonoBehaviour, IHaveDeathConditions, IGetPointsOnDestroy
     {
         private const int SCORE_POINTS = 1;
-        private const float HEIGH_BUFFER = 0.15f;
+        private const float HEIGHT_BUFFER = 0.2f;
         private const float WIDTH_BUFFER = 0.3f;
         private const float SCREEN_RIGHT_BOUND = 1f;
         private const float SCREEN_LEFT_BOUND = 0f;
@@ -14,7 +15,7 @@ namespace Asteroids
         private const float SCREEN_BOTTOM_BOUND = 0f;
 
         public event Action<int> OnDeathTakeScore;
-        public event Action<AsteroidBehaviour> OnDeathReturnToPool;
+        public event Action<AsteroidBehaviour> OnDeath;
 
         [SerializeField] private AsteroidSplitting _splittingScript;
         [SerializeField] private float _maxMoveSpeed;
@@ -30,12 +31,18 @@ namespace Asteroids
 
         public int _asteroidCurrentSizeLevel { private set; get; }
 
+        [Inject]
+        public void Construct(Camera camera)
+        {
+            _mainCamera = camera;
+        }
+
         private void OnEnable()
         {
             if (!_isInitialized) return;
 
             _rb.linearVelocity = Vector2.zero;
-            _rb.angularVelocity = 0f;       
+            _rb.angularVelocity = 0f;
 
             SetupMovement();
         }
@@ -49,7 +56,7 @@ namespace Asteroids
         private void Update()
         {
             Vector3 viewportPos = _mainCamera.WorldToViewportPoint(transform.position);
-            if (viewportPos.x < SCREEN_LEFT_BOUND - HEIGH_BUFFER || viewportPos.x > SCREEN_RIGHT_BOUND  + HEIGH_BUFFER || viewportPos.y > SCREEN_TOP_BOUND + WIDTH_BUFFER || viewportPos.y < SCREEN_BOTTOM_BOUND - WIDTH_BUFFER)
+            if (viewportPos.x < SCREEN_LEFT_BOUND - HEIGHT_BUFFER || viewportPos.x > SCREEN_RIGHT_BOUND + HEIGHT_BUFFER || viewportPos.y > SCREEN_TOP_BOUND + WIDTH_BUFFER || viewportPos.y < SCREEN_BOTTOM_BOUND - WIDTH_BUFFER)
             {
                 Vector3 bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector3(0, 0, transform.position.z));
                 Vector3 topRight = _mainCamera.ViewportToWorldPoint(new Vector3(1, 1, transform.position.z));
@@ -79,15 +86,14 @@ namespace Asteroids
         public void Initialize(PoolManager<AsteroidBehaviour> manager, UtilsCalculatePositions calculateUtils)
         {
             _rb = GetComponent<Rigidbody2D>();
-            _mainCamera = manager.GetCamera();
             _splittingScript.Initialize(manager);
             _isInitialized = true;
         }
 
         public void DeathConditions()
         {
-            OnDeathTakeScore.Invoke(SCORE_POINTS);
-            OnDeathReturnToPool.Invoke(this);
+            OnDeathTakeScore?.Invoke(SCORE_POINTS);
+            OnDeath?.Invoke(this);
         }
 
         public void SetCurrentSizeLevel(int level)

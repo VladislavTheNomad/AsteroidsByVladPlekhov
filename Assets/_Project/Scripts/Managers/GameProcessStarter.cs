@@ -1,21 +1,29 @@
 using System.Collections;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class GameProcessStarter : MonoBehaviour, IInitiable
+    public class GameProcessStarter : MonoBehaviour, IInitializable
     {
-
         [SerializeField, Range(1, 10)] private int _levelsOfAsteroidSplitting;
         [SerializeField] private float _timeBetweenAsteroidsSpawns;
         [SerializeField] private float _timeBetweenUFOSpawns;
-        [SerializeField] private GamePoolsController _poolManager;
-        [SerializeField] private UtilsCalculatePositions _utilsMakeRandomStartPosition;
 
         private WaitForSeconds _asteroidSpawnDelay;
         private WaitForSeconds _ufoSpawnDelay;
 
-        public void Installation()
+        private GamePoolsController _poolManager;
+        private UtilsCalculatePositions _utilsMakeRandomStartPosition;
+
+        [Inject]
+        public void Construct(DiContainer container)
+        {
+            _utilsMakeRandomStartPosition = container.TryResolve<UtilsCalculatePositions>();
+            _poolManager = container.TryResolve<GamePoolsController>();
+        }
+
+        public void Initialize()
         {
             _asteroidSpawnDelay = new WaitForSeconds(_timeBetweenAsteroidsSpawns);
             _ufoSpawnDelay = new WaitForSeconds(_timeBetweenUFOSpawns);
@@ -26,6 +34,7 @@ namespace Asteroids
 
         private IEnumerator UFOSpawn()
         {
+            yield return null;
             while (true)
             {
                 yield return _ufoSpawnDelay;
@@ -38,6 +47,7 @@ namespace Asteroids
 
         private IEnumerator AsteroidsSpawn()
         {
+            yield return null;
             while (true)
             {
                 AsteroidBehaviour newAsteroid = _poolManager.GetAsteroidPool().Get();
