@@ -13,20 +13,20 @@ namespace Asteroids
         private UIManager _uiManager;
         private List<T> _inactiveObjectsPool;
         private List<T> _activeObjectsPool;
-        private GameObject _playerObject;
-        private UtilsCalculatePositions _calculatePositions;
+        //private GameObject _playerObject;
+        //private UtilsCalculatePositions _calculatePositions;
         private DiContainer _container;
         private List<Component> _subsribedComponents = new List<Component>();
 
-        public PoolManager(GameObject prefab, int size, GameObject player, DiContainer container)
+        public PoolManager(GameObject prefab, int size, DiContainer container)
         {
             _objectPrefab = prefab;
             _poolSize = size;
-            _playerObject = player;
+            //_playerObject = player;
 
             _container = container;
             _uiManager = _container.TryResolve<UIManager>();
-            _calculatePositions = _container.TryResolve<UtilsCalculatePositions>();
+            //_calculatePositions = _container.TryResolve<UtilsCalculatePositions>();
 
             _inactiveObjectsPool = new List<T>(_poolSize);
             _activeObjectsPool = new List<T>(_poolSize);
@@ -68,11 +68,11 @@ namespace Asteroids
             _container.InjectGameObject(newObject);
             newObject.SetActive(false);
 
-            if (newObject.TryGetComponent<AsteroidBehaviour>(out AsteroidBehaviour asteroidScript))
+            if (newObject.TryGetComponent<AsteroidPresenter>(out AsteroidPresenter asteroidScript))
             {
-                if (this is PoolManager<AsteroidBehaviour> asteroidPool)
+                if (this is PoolManager<AsteroidPresenter> asteroidPool)
                 {
-                    asteroidScript.Initialize(asteroidPool, _calculatePositions);
+                    asteroidScript.Initialize();
                     _uiManager.SubscribeOnDeath(asteroidScript);
                     asteroidScript.OnDeath += HandleRetrnToPool;
                     _subsribedComponents.Add(asteroidScript);
@@ -89,11 +89,11 @@ namespace Asteroids
                 }
             }
 
-            if (newObject.TryGetComponent<UfoBehaviour>(out var ufoScript))
+            if (newObject.TryGetComponent<UfoPresenter>(out var ufoScript))
             {
-                if (this is PoolManager<UfoBehaviour> ufoPool)
+                if (this is PoolManager<UfoPresenter> ufoPool)
                 {
-                    ufoScript.Initialize(_playerObject);
+                    ufoScript.Initialize();
                     _uiManager.SubscribeOnDeath(ufoScript);
                     ufoScript.OnDeath += HandleRetrnToPool;
                     _subsribedComponents.Add(ufoScript);
@@ -117,15 +117,15 @@ namespace Asteroids
             {
                 if (comp == null) continue;
 
-                if (comp is AsteroidBehaviour asteroidBehComp)
+                if (comp is AsteroidPresenter asteroidBehComp)
                 {
                     asteroidBehComp.OnDeath -= HandleRetrnToPool;
                 }
-                else if (comp is UfoBehaviour ufoBehComp)
+                else if (comp is UfoPresenter ufoBehComp)
                 {
                     ufoBehComp.OnDeath -= HandleRetrnToPool;
                 }
-                else if (comp is BulletBehaviour bulletBehComp)
+                else if (comp is BulletPresenter bulletBehComp)
                 {
                     bulletBehComp.OnDeath -= HandleRetrnToPool;
                 }

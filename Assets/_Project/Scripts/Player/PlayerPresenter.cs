@@ -6,7 +6,7 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerPresenter : MonoBehaviour, IInitializable
+    public class PlayerPresenter : MonoBehaviour, IInitializable, IHaveDeathConditions
     {
         private const float SCREEN_RIGHT_BOUND = 1.1f;
         private const float SCREEN_LEFT_BOUND = -0.1f;
@@ -19,29 +19,23 @@ namespace Asteroids
         public event Action OnAmountLaserShotChange;
         public event Action OnPlayerIsDead;
 
-        [SerializeField, Range(10, 100)] private float _rotationSpeed;
-        [SerializeField, Range(1, 20)] private float _movementSpeed;
-        [SerializeField, Range(0, 1)] private float _bulletRechargeTime = 0.3f;
-        [SerializeField, Range(1, 30)] private float _laserRechargeTime = 10f;
-        [SerializeField] private GameObject _leftBound;
-        [SerializeField] private GameObject _rightBound;
-        [SerializeField] private LayerMask _destructableLayers;
-
-        private Rigidbody2D _rbPlayer;
         private Camera _mainCamera;
         private PlayerModel _model;
         private PlayerView _view;
+        private UIManager _uiManager;
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
+        private GamePoolsController _gamePoolsController;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 
         [Inject]
-        public void Construct(PlayerModel playermodel, PlayerView playerView, Camera mainCamera, Rigidbody2D rb)
+        public void Construct(PlayerModel playermodel, UIManager uiManager, PlayerView playerView, Camera mainCamera, GamePoolsController gamePoolsController)
         {
             _model = playermodel;
             _mainCamera = mainCamera;
             _view = playerView;
-            _rbPlayer = rb;
+            _gamePoolsController = gamePoolsController;
+            _uiManager = uiManager;
         }
 
         private void LateUpdate()
@@ -76,8 +70,9 @@ namespace Asteroids
                 {
                     newPosition.y = _topRight.y;
                 }
-                _rbPlayer.MovePosition(newPosition);
+                _view.Rb.MovePosition(newPosition);
             }
+            UpdateUI();
         }
 
         public void Initialize()
@@ -85,24 +80,22 @@ namespace Asteroids
             _bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector3(0, 0, _view.transform.position.z));
             _topRight = _mainCamera.ViewportToWorldPoint(new Vector3(1, 1, _view.transform.position.z));
 
-            _model.SetBulletRechargeTime(_bulletRechargeTime);
-            _model.SetLaserRechargeTime(_laserRechargeTime);
+            _view.MoveRequested += AddMove;
+            _view.RotateRequested += AddTorque;
+            _view.FireBulletRequested += FireBullet;
+            _view.FireLaserRequested += FireLaser;
+            _view.CollisionDetected += DeathConditions;
         }
 
         public void AddTorque(float input)
         {
-            _rbPlayer.AddTorque(input * _rotationSpeed * Time.deltaTime);
+            _view.Rb.AddTorque(input * _model.RotationSpeed * Time.deltaTime);
         }
 
         public void AddMove()
         {
-            _rbPlayer.AddForce(_view.transform.up * _movementSpeed, ForceMode2D.Force);
-            _model.UpdateSpeed(_rbPlayer.linearVelocity.magnitude);
-        }
-
-        public void PlayerIsDead()
-        {
-            OnPlayerIsDead?.Invoke();
+            _view.Rb.AddForce(_view.transform.up * _model.MovementSpeed, ForceMode2D.Force);
+            _model.UpdateSpeed(_view.Rb.linearVelocity.magnitude);
         }
 
         public void FireBullet()
@@ -110,11 +103,18 @@ namespace Asteroids
             if (_model.CanFireBullet)
             {
                 StartCoroutine(RechargeBullet());
-                _view.SpawnBullet();
+                SpawnBullet();
             }
         }
 
-        public void FireLazer()
+        public void SpawnBullet()
+        {
+            BulletPresenter bulletSpawn = _gamePoolsController.GetBulletPool().Get();
+            bulletSpawn.transform.SetPositionAndRotation(_view.transform.position, _view.transform.rotation);
+            bulletSpawn.gameObject.SetActive(true);
+        }
+
+        public void FireLaser()
         {
             if (_model.LaserShots > 0)
             {
@@ -123,15 +123,26 @@ namespace Asteroids
                 _model.DecreaseLaserShots();
                 OnAmountLaserShotChange?.Invoke();
                 StartCoroutine(RechargeLazer(slotIndex));
-                RayCastGo(_leftBound);
-                RayCastGo(_rightBound);
+                RayCastGo(_view.LeftBound);
+                RayCastGo(_view.RightBound);
             }
+        }
+
+        public void DeathConditions()
+        {
+            OnPlayerIsDead?.Invoke();
+        }
+
+        public void UpdateUI()
+        {
+            _uiManager.UpdateSpeed(_model.CurrentSpeed);
+            _uiManager.UpdateCoordinates(_model.Position, _model.Rotation);
         }
 
         private IEnumerator RechargeBullet()
         {
             _model.SetCanFireBullet(false);
-            yield return new WaitForSeconds(_bulletRechargeTime);
+            yield return new WaitForSeconds(_model.BulletRechargeTime);
             _model.SetCanFireBullet(true);
         }
 
@@ -153,7 +164,7 @@ namespace Asteroids
 
         private void RayCastGo(GameObject bound)
         {
-            int hits = Physics2D.RaycastNonAlloc(bound.transform.position, _view.transform.up, _raycastHits, LASER_DISTANCE, _destructableLayers);
+            int hits = Physics2D.RaycastNonAlloc(bound.transform.position, _view.transform.up, _raycastHits, LASER_DISTANCE, _model.DestructableLayers);
 
             for (int i = 0; i < hits; i++)
             {
@@ -167,6 +178,12 @@ namespace Asteroids
         private void OnDestroy()
         {
             StopAllCoroutines();
+
+            _view.MoveRequested -= AddMove;
+            _view.RotateRequested -= AddTorque;
+            _view.FireBulletRequested -= FireBullet;
+            _view.FireLaserRequested -= FireLaser;
+            _view.CollisionDetected -= DeathConditions;
         }
     }
 }

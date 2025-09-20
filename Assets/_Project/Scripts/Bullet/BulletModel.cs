@@ -5,10 +5,10 @@ namespace Asteroids
         public float BulletsLifeTime { get; private set; }
         public float MoveSpeed { get; private set; }
 
-        public BulletModel(float bulletsLifeTime, float moveSpeed)
+        public BulletModel(BulletConfig bulletConfig)
         {
-            BulletsLifeTime = bulletsLifeTime;
-            MoveSpeed = moveSpeed;
+            BulletsLifeTime = bulletConfig.BulletsLifeTime;
+            MoveSpeed = bulletConfig.MoveSpeed;
         }
     }
 }

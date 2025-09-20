@@ -4,16 +4,10 @@ namespace Asteroids
 {
     public class PlayerConfig : MonoBehaviour
     {
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
-        
-        }
-
-        // Update is called once per frame
-        void Update()
-        {
-        
-        }
+        [field: SerializeField, Range(10, 100)] public float RotationSpeed { get; private set; }
+        [field: SerializeField, Range(1, 20)] public float MovementSpeed { get; private set; }
+        [field: SerializeField, Range(0, 1)] public float BulletRechargeTime { get; private set; }
+        [field: SerializeField, Range(1, 30)] public float LaserRechargeTime { get; private set; }
+        [field: SerializeField] public LayerMask DestructableLayers { get; private set; }
     }
 }

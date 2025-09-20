@@ -13,31 +13,33 @@ namespace Asteroids
 
         [SerializeField] PlayerPresenter _playerPresenter;
         [SerializeField] PlayerView _playerView;
+        [SerializeField] PlayerConfig _playerConfig;
 
         [SerializeField] BulletConfig _bulletConfig;
 
+        [SerializeField] AsteroidConfig _asteroidConfig;
+
+        [SerializeField] UFOConfig _ufoConfig;
+
+
         public override void InstallBindings()
         {
-            Container.Bind<PlayerModel>().AsSingle().NonLazy();
-            Container.Bind<BulletModel>().AsSingle().WithArguments(_bulletConfig.BulletsLifeTime, _bulletConfig.MoveSpeed);
+            Container.Bind<PlayerModel>().AsSingle().WithArguments(_playerConfig).NonLazy();
+            Container.Bind<BulletModel>().AsSingle().WithArguments(_bulletConfig).NonLazy();
+            Container.Bind<AsteroidModel>().AsSingle().WithArguments(_asteroidConfig).NonLazy();
+            Container.Bind<UfoModel>().AsSingle().WithArguments(_ufoConfig).NonLazy();
 
             Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<GameObject>().FromInstance(_playerObject).AsSingle();
 
+            Container.BindInterfacesAndSelfTo<PlayerView>().FromInstance(_playerView).AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerPresenter>().FromInstance(_playerPresenter).AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerView>().FromInstance(_playerView).AsSingle();
+
+            //Container.BindInterfacesAndSelfTo<UfoPresenter>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<UIManager>().FromInstance(_uiManager).AsSingle();
             Container.BindInterfacesAndSelfTo<GamePoolsController>().FromInstance(_gamePoolsController).AsSingle();
             Container.BindInterfacesAndSelfTo<GameProcessStarter>().FromInstance(_gameProcessStarter).AsSingle();
-
-            Container.Bind<GameObject>().FromInstance(_playerObject).AsSingle();
-
-            //Container.Bind<FireLaser>().FromComponentOn(_playerObject).AsSingle();
-            //Container.Bind<LaserVisual>().FromComponentOn(_playerObject).AsSingle();
-            //Container.Bind<FireBullet>().FromComponentOn(_playerObject).AsSingle();
-            Container.Bind<Rigidbody2D>().FromComponentOn(_playerObject).AsSingle();
-            //Container.Bind<LineRenderer>().FromComponentOn(_playerObject).AsSingle();
-            //Container.Bind<CheckDeathConditions>().FromComponentOn(_playerObject).AsSingle();
 
             Container.Bind<Camera>().FromInstance(_camera).AsSingle();
         }

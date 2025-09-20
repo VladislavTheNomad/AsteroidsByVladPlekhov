@@ -24,7 +24,7 @@ namespace Asteroids
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.TryGetComponent<AsteroidBehaviour>(out var asteroid) || collision.TryGetComponent<UfoBehaviour>(out var ufo))
+            if (collision.TryGetComponent<AsteroidView>(out var asteroid) || collision.TryGetComponent<UfoView>(out var ufo))
             {
                 OnHit?.Invoke();
             }
@@ -44,6 +44,11 @@ namespace Asteroids
         {
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
+        }
+
+        public void SetActive(bool switcher)
+        {
+            gameObject.SetActive(switcher);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace Asteroids
 
             _bulletView.OnHit += DeathConditions;
             _bulletView.OnEnabled += StartLifeTime;
-            _bulletView.OnDisabled += OnDestroy;
+            _bulletView.OnDisabled += OnDisable;
             _bulletView.Initialize();
         }
 

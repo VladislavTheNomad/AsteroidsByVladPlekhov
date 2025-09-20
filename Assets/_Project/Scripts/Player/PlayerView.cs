@@ -5,32 +5,28 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerView : MonoBehaviour, IInitializable
+    public class PlayerView : MonoBehaviour, IInitializable, IPlayerView
     {
         private const float LASER_WIDTH = 0.2f;
         private const float LASER_DURATION = 0.25f;
         private const float LASER_LENGTH = 20f;
 
-        private LineRenderer _lineRenderer;
-        private PlayerPresenter _presenter;
-        private PlayerModel _model;
-        private UIManager _uiManager;
-        private GamePoolsController _gamePoolsController;
+        public event Action MoveRequested;
+        public event Action<float> RotateRequested;
+        public event Action FireBulletRequested;
+        public event Action FireLaserRequested;
+        public event Action CollisionDetected;
 
+        private LineRenderer _lineRenderer;
         private PlayerControls _playerControls;
+
+        [field: SerializeField] public GameObject LeftBound { get; private set; }
+        [field: SerializeField] public GameObject RightBound { get; private set; }
         public float _moveInput { get; private set; }
         public float _rotateInput { get; private set; }
+        public Rigidbody2D Rb { get; private set; }
 
         private float _shootBulletInput;
-
-        [Inject]
-        public void Construct(PlayerPresenter pp, PlayerModel pm, UIManager uiManager, GamePoolsController gamePoolsController)
-        {
-            _presenter = pp;
-            _model = pm;
-            _uiManager = uiManager;
-            _gamePoolsController = gamePoolsController;
-        }
 
         private void OnDisable()
         {
@@ -39,9 +35,9 @@ namespace Asteroids
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.GetComponent<AsteroidBehaviour>() || collision.GetComponent<UfoBehaviour>())
+            if (collision.GetComponent<AsteroidView>() || collision.GetComponent<UfoView>())
             {
-                _presenter.PlayerIsDead();
+                CollisionDetected?.Invoke();
             }
         }
 
@@ -49,24 +45,24 @@ namespace Asteroids
         {
             if (_shootBulletInput > 0f)
             {
-                _presenter.FireBullet();
+                FireBulletRequested?.Invoke();
             }
-            UpdateUI();
         }
 
         private void FixedUpdate()
         {
-            _presenter.AddTorque(_rotateInput);
+            RotateRequested?.Invoke(_rotateInput);
 
             if (_moveInput > 0f)
             {
-                _presenter.AddMove();
+                MoveRequested?.Invoke();
             }
         }
 
         public void Initialize()
         {
             _lineRenderer = GetComponent<LineRenderer>();
+            Rb = GetComponent<Rigidbody2D>();
 
             _playerControls = new PlayerControls();
             _playerControls.Player.Enable();
@@ -79,19 +75,6 @@ namespace Asteroids
             _playerControls.Player.ShootBullet.canceled += context => _shootBulletInput = 0f;
 
             _playerControls.Player.ShootLaser.started += context => ShootLaser();
-        }
-
-        public void UpdateUI()
-        {
-            _uiManager.UpdateSpeed(_model.Speed);
-            _uiManager.UpdateCoordinates(_model.Position, _model.Rotation);
-        }
-
-        public void SpawnBullet()
-        {
-            BulletPresenter bulletSpawn = _gamePoolsController.GetBulletPool().Get();
-            bulletSpawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
-            bulletSpawn.gameObject.SetActive(true);
         }
 
         public void ShowLaserVisual()
@@ -127,7 +110,7 @@ namespace Asteroids
 
         private void ShootLaser()
         {
-            _presenter.FireLazer();
+            FireLaserRequested?.Invoke();
         }
 
         private void OnDestroy()

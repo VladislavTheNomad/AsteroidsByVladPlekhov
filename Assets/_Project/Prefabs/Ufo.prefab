@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 8091092638751847482}
   - component: {fileID: 7563750162971253246}
   - component: {fileID: 6622796616691350540}
-  - component: {fileID: 2334258308639938663}
   - component: {fileID: -87764259963745147}
+  - component: {fileID: 3470815863117360042}
+  - component: {fileID: 7981788059904876092}
   m_Layer: 10
   m_Name: Ufo
   m_TagString: Untagged
@@ -136,20 +137,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5554265, y: 0.43858236}
   m_EdgeRadius: 0
---- !u!114 &2334258308639938663
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5821226311079335962}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7a5f397d630300345af9f8241dfa9a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _moveSpeed: 2
-  _gapBetweenPositionChanging: 1
 --- !u!50 &-87764259963745147
 Rigidbody2D:
   serializedVersion: 5
@@ -177,3 +164,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &3470815863117360042
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5821226311079335962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f4aa52764869a64ca5ca42f47a1e8a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _view: {fileID: 7981788059904876092}
+--- !u!114 &7981788059904876092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5821226311079335962}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b943e68098b05a64a8d8cd9e22d18d07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

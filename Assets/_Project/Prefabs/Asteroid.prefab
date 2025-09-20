@@ -11,9 +11,9 @@ GameObject:
   - component: {fileID: 8939280248956062642}
   - component: {fileID: 592785205296294597}
   - component: {fileID: 7813143913348445786}
-  - component: {fileID: 1054214700367072149}
-  - component: {fileID: 3668920791505718015}
   - component: {fileID: 6793464892841853278}
+  - component: {fileID: 4539041084291311923}
+  - component: {fileID: 3409097874803872506}
   m_Layer: 10
   m_Name: Asteroid
   m_TagString: Untagged
@@ -127,35 +127,6 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0.011158526, y: 0}
   m_Radius: 0.8595745
---- !u!114 &1054214700367072149
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4265792025796565592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b84bbfbaac251ad4b814dc6ba22115db, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _splittingScript: {fileID: 3668920791505718015}
-  _maxMoveSpeed: 50
-  _minMoveSpeed: 20
-  _maxSizeLevel: 3
---- !u!114 &3668920791505718015
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4265792025796565592}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4ccfc230fc870034badafa2ecaa82f95, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _asteroidBehaviour: {fileID: 1054214700367072149}
 --- !u!50 &6793464892841853278
 Rigidbody2D:
   serializedVersion: 5
@@ -183,3 +154,28 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &4539041084291311923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4265792025796565592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99e8975666c444f4ca749dab8d946af3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _view: {fileID: 3409097874803872506}
+--- !u!114 &3409097874803872506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4265792025796565592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c2a2167ddff41547bc7842ef2cb3b08, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

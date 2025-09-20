@@ -8,18 +8,21 @@ namespace Asteroids
 
         public Vector3 Position { get; private set; }
         public float Rotation { get; private set; }
-        public float Speed { get; private set; }
+        public float CurrentSpeed { get; private set; }
+        public float MovementSpeed { get; private set; }
+        public float RotationSpeed { get; private set; }
         public int LaserShots { get; private set; }
         public float BulletRechargeTime { get; private set; }
         public float LaserRechargeTime { get; private set; }
         public float[] LaserRechargeTimers { get; private set; }
         public bool CanFireBullet { get; private set; }
+        public LayerMask DestructableLayers { get; private set; }
 
-        public PlayerModel()
+        public PlayerModel(PlayerConfig playerConfig)
         {
             Position = Vector3.zero;
             Rotation = 0f;
-            Speed = 0f;
+            CurrentSpeed = 0f;
             LaserShots = MAX_LASER_SHOTS;
             CanFireBullet = true;
             LaserRechargeTimers = new float[MAX_LASER_SHOTS];
@@ -27,6 +30,12 @@ namespace Asteroids
             {
                 LaserRechargeTimers[i] = 0f;
             }
+
+            MovementSpeed = playerConfig.MovementSpeed;
+            RotationSpeed = playerConfig.RotationSpeed;
+            BulletRechargeTime = playerConfig.BulletRechargeTime;
+            LaserRechargeTime = playerConfig.LaserRechargeTime;
+            DestructableLayers = playerConfig.DestructableLayers;
         }
 
         public void UpdatePosition(Vector3 newPosition)
@@ -41,7 +50,7 @@ namespace Asteroids
 
         public void UpdateSpeed(float newSpeed)
         {
-            Speed = newSpeed;
+            CurrentSpeed = newSpeed;
         }
 
         public void IncreaseLaserShots()
@@ -76,7 +85,5 @@ namespace Asteroids
         }
 
         public int GetMaxLaserShots() => MAX_LASER_SHOTS;
-        public float SetBulletRechargeTime(float num) => BulletRechargeTime;
-        public float SetLaserRechargeTime(float num) => LaserRechargeTime;
     }
 }
