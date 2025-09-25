@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using System.Drawing;
 using UnityEngine;
 using Zenject;
-using Zenject.SpaceFighter;
 
 namespace Asteroids
 {
@@ -13,8 +11,6 @@ namespace Asteroids
         private UIManager _uiManager;
         private List<T> _inactiveObjectsPool;
         private List<T> _activeObjectsPool;
-        //private GameObject _playerObject;
-        //private UtilsCalculatePositions _calculatePositions;
         private DiContainer _container;
         private List<Component> _subsribedComponents = new List<Component>();
 
@@ -22,11 +18,9 @@ namespace Asteroids
         {
             _objectPrefab = prefab;
             _poolSize = size;
-            //_playerObject = player;
 
             _container = container;
             _uiManager = _container.TryResolve<UIManager>();
-            //_calculatePositions = _container.TryResolve<UtilsCalculatePositions>();
 
             _inactiveObjectsPool = new List<T>(_poolSize);
             _activeObjectsPool = new List<T>(_poolSize);
@@ -63,14 +57,14 @@ namespace Asteroids
         private void AddNewObjectInPool()
         {
             GameObject newObject = GameObject.Instantiate(_objectPrefab, Vector3.zero, Quaternion.identity);
-            T component = newObject.GetComponent<T>();
+            newObject.TryGetComponent<T>(out T component);
 
             _container.InjectGameObject(newObject);
             newObject.SetActive(false);
 
             if (newObject.TryGetComponent<AsteroidPresenter>(out AsteroidPresenter asteroidScript))
             {
-                if (this is PoolManager<AsteroidPresenter> asteroidPool)
+                if (this is PoolManager<AsteroidPresenter>)
                 {
                     asteroidScript.Initialize();
                     _uiManager.SubscribeOnDeath(asteroidScript);
@@ -81,7 +75,7 @@ namespace Asteroids
 
             if (newObject.TryGetComponent<BulletPresenter>(out var bulletScript))
             {
-                if (this is PoolManager<BulletPresenter> bulletPool)
+                if (this is PoolManager<BulletPresenter>)
                 {
                     bulletScript.Initialize();
                     bulletScript.OnDeath += HandleRetrnToPool;
@@ -91,7 +85,7 @@ namespace Asteroids
 
             if (newObject.TryGetComponent<UfoPresenter>(out var ufoScript))
             {
-                if (this is PoolManager<UfoPresenter> ufoPool)
+                if (this is PoolManager<UfoPresenter>)
                 {
                     ufoScript.Initialize();
                     _uiManager.SubscribeOnDeath(ufoScript);

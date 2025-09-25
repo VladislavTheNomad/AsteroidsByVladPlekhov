@@ -1,12 +1,14 @@
 using System;
 using UnityEngine;
-using Zenject;
 
 namespace Asteroids
 {
+    [RequireComponent(typeof(Rigidbody2D), typeof(Transform))]
     public class UfoView : MonoBehaviour
     {
         public event Action OnDeath;
+
+        public Transform ViewTransform { get; private set; }
 
         private Rigidbody2D _rb;
 
@@ -19,9 +21,10 @@ namespace Asteroids
         public void Initialize()
         {
             _rb = GetComponent<Rigidbody2D>();
+            ViewTransform = GetComponent<Transform>();
         }
 
-        public void DoMove(Vector3 destination, float moveSpeed)
+        public void Move(Vector3 destination, float moveSpeed)
         {
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;

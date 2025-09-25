@@ -13,48 +13,49 @@ namespace Asteroids
         [SerializeField] private UfoView _view;
 
         private UfoModel _model;
-        private GameObject _playerObject;
-        private Vector3 _destination;
         private bool _initialized;
+        private Vector3 _destination;
 
         [Inject]
-        public void Construct(UfoModel model, GameObject playerObject)
+        public void Construct(UfoModel model)
         {
             _model = model;
-            _playerObject = playerObject;
         }
 
         private void OnEnable()
         {
             if(_initialized)
             {
-                MoveBehaviour();
+                ApplyBehaviour();
             }
         }
 
         public void Initialize()
         {
-            _view.OnDeath += DeathConditions;
+            _view.OnDeath += HandleDeath;
             _view.Initialize();
             _initialized = true;
-            MoveBehaviour();
+            ApplyBehaviour();
         }
 
-        public async void MoveBehaviour()
+        public async void ApplyBehaviour()
         {
-            while (gameObject.activeSelf)
+            while (_view.gameObject.activeSelf)
             {
                 await Task.Delay((int)(_model.GapBetweenPositionChanging * 1000));
-                if (_view == null || _playerObject == null || !_playerObject.activeSelf)
+                if (_model.CheckNull(_view.ViewTransform))
                 {
-                    return;
+                    _destination = _model.GetNewDestination(_view.ViewTransform);
+                    _view.Move(_destination, _model.MoveSpeed);
                 }
-                _destination = (_playerObject.transform.position - _view.transform.position).normalized;
-                _view.DoMove(_destination, _model.MoveSpeed);
+                else
+                {
+                    break;
+                }
             }
         }
 
-        public void DeathConditions()
+        public void HandleDeath()
         {
             OnDeathTakeScore?.Invoke(_model.ScorePoints);
             OnDeath?.Invoke(this);
@@ -62,7 +63,7 @@ namespace Asteroids
 
         public void OnDestroy()
         {
-            _view.OnDeath -= MoveBehaviour;
+            _view.OnDeath -= HandleDeath;
         }
     }
 }

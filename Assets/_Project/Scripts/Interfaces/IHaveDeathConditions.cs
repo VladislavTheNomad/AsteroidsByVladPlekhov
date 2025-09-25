@@ -2,6 +2,6 @@ namespace Asteroids
 {
     public interface IHaveDeathConditions
     {
-        public void DeathConditions();
+        public void HandleDeath();
     }
 }

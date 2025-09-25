@@ -9,18 +9,15 @@ namespace Asteroids
         [SerializeField] private UIManager _uiManager;
         [SerializeField] private GameProcessStarter _gameProcessStarter;
         [SerializeField] private Camera _camera;
-        [SerializeField] private GameObject _playerObject;
+        //[SerializeField] private GameObject _playerObject;
 
         [SerializeField] PlayerPresenter _playerPresenter;
         [SerializeField] PlayerView _playerView;
+
         [SerializeField] PlayerConfig _playerConfig;
-
         [SerializeField] BulletConfig _bulletConfig;
-
         [SerializeField] AsteroidConfig _asteroidConfig;
-
         [SerializeField] UFOConfig _ufoConfig;
-
 
         public override void InstallBindings()
         {
@@ -30,18 +27,15 @@ namespace Asteroids
             Container.Bind<UfoModel>().AsSingle().WithArguments(_ufoConfig).NonLazy();
 
             Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<GameObject>().FromInstance(_playerObject).AsSingle();
+            Container.Bind<Camera>().FromInstance(_camera).AsSingle().NonLazy();
 
+            //Container.BindInterfacesAndSelfTo<GameObject>().FromInstance(_playerObject).AsSingle();
             Container.BindInterfacesAndSelfTo<PlayerView>().FromInstance(_playerView).AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerPresenter>().FromInstance(_playerPresenter).AsSingle();
-
-            //Container.BindInterfacesAndSelfTo<UfoPresenter>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<UIManager>().FromInstance(_uiManager).AsSingle();
             Container.BindInterfacesAndSelfTo<GamePoolsController>().FromInstance(_gamePoolsController).AsSingle();
             Container.BindInterfacesAndSelfTo<GameProcessStarter>().FromInstance(_gameProcessStarter).AsSingle();
-
-            Container.Bind<Camera>().FromInstance(_camera).AsSingle();
         }
     }
 }

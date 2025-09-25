@@ -4,6 +4,7 @@ using Zenject;
 
 namespace Asteroids
 {
+    [RequireComponent(typeof(Rigidbody2D))]
     public class BulletView : MonoBehaviour, IInitializable
     {
         public event Action OnEnabled;
@@ -44,11 +45,6 @@ namespace Asteroids
         {
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
-        }
-
-        public void SetActive(bool switcher)
-        {
-            gameObject.SetActive(switcher);
         }
     }
 }

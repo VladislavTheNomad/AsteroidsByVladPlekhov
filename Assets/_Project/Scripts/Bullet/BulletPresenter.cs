@@ -5,7 +5,7 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class BulletPresenter : MonoBehaviour, IInitializable
+    public class BulletPresenter : MonoBehaviour, IInitializable, IHaveDeathConditions
     {
         public event Action<BulletPresenter> OnDeath;
 
@@ -25,7 +25,7 @@ namespace Asteroids
         {
             _bulletLifeSpan = new WaitForSeconds(_bulletModel.BulletsLifeTime);
 
-            _bulletView.OnHit += DeathConditions;
+            _bulletView.OnHit += HandleDeath;
             _bulletView.OnEnabled += StartLifeTime;
             _bulletView.OnDisabled += OnDisable;
             _bulletView.Initialize();
@@ -39,7 +39,7 @@ namespace Asteroids
             }
         }
 
-        public void DeathConditions()
+        public void HandleDeath()
         {
             _bulletView.StopBulletMovement();
             OnDeath?.Invoke(this);
@@ -49,7 +49,7 @@ namespace Asteroids
         {
             _bulletView.MoveBullet(_bulletModel.MoveSpeed);
             yield return _bulletLifeSpan;
-            DeathConditions();
+            HandleDeath();
         }
 
         private void OnDisable()
@@ -59,7 +59,7 @@ namespace Asteroids
 
         private void OnDestroy()
         {
-            _bulletView.OnHit -= DeathConditions;
+            _bulletView.OnHit -= HandleDeath;
             _bulletView.OnEnabled -= StartLifeTime;
             _bulletView.OnDisabled -= OnDisable;
         }

@@ -1,20 +1,21 @@
 using System;
 using UnityEngine;
-using UnityEngine.Rendering;
-using Zenject;
 
 namespace Asteroids
 {
+    [RequireComponent(typeof(Rigidbody2D), typeof(Transform))]
     public class AsteroidView : MonoBehaviour
     {
         public event Action OnDeath;
         public event Action OnMovement;
 
+        public Transform Transform { get; private set; }
+
         private Rigidbody2D _rb;
 
         private void OnTriggerEnter2D(Collider2D other)
         {
-            if (!other.GetComponent<BulletView>()) return;
+            if (!other.TryGetComponent<BulletView>(out BulletView bv)) return;
             OnDeath?.Invoke();
         }
 
@@ -26,9 +27,10 @@ namespace Asteroids
         public void Initialize()
         {
             _rb = GetComponent<Rigidbody2D>();
+            Transform = GetComponent<Transform>();
         }
 
-        public void DoMove(Vector3 destination, float impulse, float acceleration)
+        public void Move(Vector3 destination, float impulse, float acceleration)
         {
             _rb.AddForce(destination * impulse * acceleration, ForceMode2D.Force);
         }

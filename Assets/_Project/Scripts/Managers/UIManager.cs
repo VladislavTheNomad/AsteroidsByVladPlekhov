@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -47,15 +46,15 @@ namespace Asteroids
             _quitButton.onClick.RemoveListener(QuitButtonClick);
 
             _playerPresenter.OnPlayerIsDead -= PlayerIsDead;
-            _playerPresenter.OnAmountLaserShotChange -= UpdateCurrentShot;
+            _playerModel.OnAmountLaserShotChange -= UpdateCurrentShot;
             _playerPresenter.OnRechargeTimer -= UpdateRechargeTimer;
         }
 
         public void Initialize()
         {
             _playerPresenter.OnPlayerIsDead += PlayerIsDead;
-            _playerPresenter.OnAmountLaserShotChange += UpdateCurrentShot;
             _playerPresenter.OnRechargeTimer += UpdateRechargeTimer;
+            _playerModel.OnAmountLaserShotChange += UpdateCurrentShot;
 
             UpdateCurrentShot();
 

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Asteroids
@@ -5,6 +6,14 @@ namespace Asteroids
     public class PlayerModel
     {
         private const int MAX_LASER_SHOTS = 3;
+        private const float SCREEN_RIGHT_BOUND = 1.1f;
+        private const float SCREEN_LEFT_BOUND = -0.1f;
+        private const float SCREEN_TOP_BOUND = 1.1f;
+        private const float SCREEN_BOTTOM_BOUND = -0.1f;
+        private const int SIZE_OF_RAYCASTHITS_ARRAY = 10;
+        private const float LASER_DISTANCE = 20f;
+
+        public event Action OnAmountLaserShotChange;
 
         public Vector3 Position { get; private set; }
         public float Rotation { get; private set; }
@@ -18,7 +27,13 @@ namespace Asteroids
         public bool CanFireBullet { get; private set; }
         public LayerMask DestructableLayers { get; private set; }
 
-        public PlayerModel(PlayerConfig playerConfig)
+        private Vector3 _bottomLeft;
+        private Vector3 _topRight;
+        private Camera _mainCamera;
+        private GamePoolsController _gamePoolsController;
+        private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
+
+        public PlayerModel(PlayerConfig playerConfig, Camera camera, GamePoolsController gamePoolsController)
         {
             Position = Vector3.zero;
             Rotation = 0f;
@@ -36,6 +51,94 @@ namespace Asteroids
             BulletRechargeTime = playerConfig.BulletRechargeTime;
             LaserRechargeTime = playerConfig.LaserRechargeTime;
             DestructableLayers = playerConfig.DestructableLayers;
+            _mainCamera = camera;
+            _gamePoolsController = gamePoolsController;
+
+            _bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector2(0, 0));
+            _topRight = _mainCamera.ViewportToWorldPoint(new Vector2(1, 1));
+        }
+
+        public Vector3 CheckBounds(Transform transform)
+        {
+            Vector3 playerPositionInCameraCoordinates = _mainCamera.WorldToViewportPoint(transform.position);
+            UpdatePosition(playerPositionInCameraCoordinates);
+            UpdateRotation(transform.eulerAngles.z);
+
+            if (
+                playerPositionInCameraCoordinates.x < SCREEN_LEFT_BOUND ||
+                playerPositionInCameraCoordinates.x > SCREEN_RIGHT_BOUND ||
+                playerPositionInCameraCoordinates.y > SCREEN_TOP_BOUND ||
+                playerPositionInCameraCoordinates.y < SCREEN_BOTTOM_BOUND
+                )
+            {
+                Vector3 newPosition = transform.position;
+
+                if (playerPositionInCameraCoordinates.x > SCREEN_RIGHT_BOUND)
+                {
+                    newPosition.x = _bottomLeft.x;
+                }
+                else if (playerPositionInCameraCoordinates.x < SCREEN_LEFT_BOUND)
+                {
+                    newPosition.x = _topRight.x;
+                }
+
+                if (playerPositionInCameraCoordinates.y > SCREEN_TOP_BOUND)
+                {
+                    newPosition.y = _bottomLeft.y;
+                }
+                else if (playerPositionInCameraCoordinates.y < SCREEN_BOTTOM_BOUND)
+                {
+                    newPosition.y = _topRight.y;
+                }
+                return newPosition;
+            }
+            return Vector3.zero;
+        }
+
+        public bool FireBullet(Transform transform)
+        {
+            if (CanFireBullet)
+            {
+                SpawnBullet(transform);
+                return true;
+            }
+            return false;
+        }
+
+        public void SpawnBullet(Transform transform)
+        {
+            BulletPresenter bulletSpawn = _gamePoolsController.GetBulletPool().Get();
+            bulletSpawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
+            bulletSpawn.gameObject.SetActive(true);
+        }
+
+        public void FireLaser(out bool canFire, out int slotIndex)
+        {
+            if (LaserShots > 0)
+            {
+                slotIndex = LaserShots - 1;
+                DecreaseLaserShots();
+                OnAmountLaserShotChange?.Invoke();
+                canFire = true;
+            }
+            else
+            {
+                canFire = false;
+                slotIndex = -1;
+            }
+        }
+
+        public void RayCastGo(GameObject bound, Transform transform)
+        {
+            int hits = Physics2D.RaycastNonAlloc(bound.transform.position, transform.up, _raycastHits, LASER_DISTANCE, DestructableLayers);
+
+            for (int i = 0; i < hits; i++)
+            {
+                if (_raycastHits[i].collider.TryGetComponent<IHaveDeathConditions>(out var objectToDestroy))
+                {
+                    objectToDestroy.HandleDeath();
+                }
+            }
         }
 
         public void UpdatePosition(Vector3 newPosition)

@@ -12,7 +12,6 @@ namespace Asteroids
 
         private WaitForSeconds _asteroidSpawnDelay;
         private WaitForSeconds _ufoSpawnDelay;
-
         private GamePoolsController _poolManager;
         private UtilsCalculatePositions _utilsMakeRandomStartPosition;
 

@@ -5,7 +5,8 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerView : MonoBehaviour, IInitializable, IPlayerView
+    [RequireComponent(typeof(LineRenderer), typeof(Rigidbody2D), typeof(Transform))]
+    public class PlayerView : MonoBehaviour, IInitializable
     {
         private const float LASER_WIDTH = 0.2f;
         private const float LASER_DURATION = 0.25f;
@@ -25,6 +26,7 @@ namespace Asteroids
         public float _moveInput { get; private set; }
         public float _rotateInput { get; private set; }
         public Rigidbody2D Rb { get; private set; }
+        public Transform ViewTransform { get; private set; }
 
         private float _shootBulletInput;
 
@@ -35,7 +37,7 @@ namespace Asteroids
 
         private void OnTriggerEnter2D(Collider2D collision)
         {
-            if (collision.GetComponent<AsteroidView>() || collision.GetComponent<UfoView>())
+            if (collision.TryGetComponent<AsteroidView>(out AsteroidView av) || collision.TryGetComponent<UfoView>(out UfoView uv))
             {
                 CollisionDetected?.Invoke();
             }
@@ -63,6 +65,7 @@ namespace Asteroids
         {
             _lineRenderer = GetComponent<LineRenderer>();
             Rb = GetComponent<Rigidbody2D>();
+            ViewTransform = GetComponent<Transform>();
 
             _playerControls = new PlayerControls();
             _playerControls.Player.Enable();
@@ -75,6 +78,21 @@ namespace Asteroids
             _playerControls.Player.ShootBullet.canceled += context => _shootBulletInput = 0f;
 
             _playerControls.Player.ShootLaser.started += context => ShootLaser();
+        }
+
+        public void Teleport(Vector3 newPosition)
+        {
+            Rb.MovePosition(newPosition);
+        }
+
+        public void Rotate(float direction, float speed)
+        {
+            Rb.AddTorque(direction * speed * Time.deltaTime);
+        }
+
+        public void Move(float speed, ForceMode2D forceType)
+        {
+            Rb.AddForce(speed * transform.up, forceType);
         }
 
         public void ShowLaserVisual()
