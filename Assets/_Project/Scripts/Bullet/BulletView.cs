@@ -5,10 +5,9 @@ using Zenject;
 namespace Asteroids
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class BulletView : MonoBehaviour, IInitializable
+    public class BulletView : MonoBehaviour
     {
         public event Action OnEnabled;
-        public event Action OnDisabled;
         public event Action OnHit;
 
         private Rigidbody2D _rb;
@@ -16,11 +15,6 @@ namespace Asteroids
         private void OnEnable()
         {
             OnEnabled?.Invoke();
-        }
-
-        private void OnDisable()
-        {
-            OnDisabled?.Invoke();
         }
 
         private void OnTriggerEnter2D(Collider2D collision)

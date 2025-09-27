@@ -19,9 +19,10 @@ namespace Asteroids
             GapBetweenPositionChanging = config.GapBetweenPositionChanging;
         }
 
-        public Vector3 GetNewDestination(Transform transform)
+        public void GetNewDestination(Transform transform, out Vector3 destination, out float moveSpeed)
         {
-            return (_playerView.transform.position - transform.position).normalized;
+            destination = (_playerView.transform.position - transform.position).normalized;
+            moveSpeed = MoveSpeed;
         }
 
         public bool CheckNull(Transform transform)

@@ -12,7 +12,7 @@ namespace Asteroids
         private List<T> _inactiveObjectsPool;
         private List<T> _activeObjectsPool;
         private DiContainer _container;
-        private List<Component> _subsribedComponents = new List<Component>();
+        private List<object> _subsribedComponents = new List<object>();
 
         public PoolManager(GameObject prefab, int size, DiContainer container)
         {
@@ -62,35 +62,38 @@ namespace Asteroids
             _container.InjectGameObject(newObject);
             newObject.SetActive(false);
 
-            if (newObject.TryGetComponent<AsteroidPresenter>(out AsteroidPresenter asteroidScript))
+            if (newObject.TryGetComponent<AsteroidView>(out AsteroidView asteroidScript))
             {
-                if (this is PoolManager<AsteroidPresenter>)
+                if (this is PoolManager<AsteroidView>)
                 {
-                    asteroidScript.Initialize();
-                    _uiManager.SubscribeOnDeath(asteroidScript);
-                    asteroidScript.OnDeath += HandleRetrnToPool;
-                    _subsribedComponents.Add(asteroidScript);
+                    AsteroidPresenter presenter = _container.Instantiate<AsteroidPresenter>();
+                    presenter.Initialize(asteroidScript);
+                    _uiManager.SubscribeOnDeath(presenter);
+                    presenter.OnDeath += HandleRetrnToPool;
+                    _subsribedComponents.Add(presenter);
                 }
             }
 
-            if (newObject.TryGetComponent<BulletPresenter>(out var bulletScript))
+            if (newObject.TryGetComponent<BulletView>(out BulletView bulletScript))
             {
-                if (this is PoolManager<BulletPresenter>)
+                if (this is PoolManager<BulletView>)
                 {
-                    bulletScript.Initialize();
-                    bulletScript.OnDeath += HandleRetrnToPool;
+                    BulletPresenter presenter = _container.Instantiate<BulletPresenter>();
+                    presenter.Initialize(bulletScript);
+                    presenter.OnDeath += HandleRetrnToPool;
                     _subsribedComponents.Add(bulletScript);
                 }
             }
 
-            if (newObject.TryGetComponent<UfoPresenter>(out var ufoScript))
+            if (newObject.TryGetComponent<UfoView>(out UfoView ufoScript))
             {
-                if (this is PoolManager<UfoPresenter>)
+                if (this is PoolManager<UfoView>)
                 {
-                    ufoScript.Initialize();
-                    _uiManager.SubscribeOnDeath(ufoScript);
-                    ufoScript.OnDeath += HandleRetrnToPool;
-                    _subsribedComponents.Add(ufoScript);
+                    UfoPresenter presenter = _container.Instantiate<UfoPresenter>();
+                    presenter.Initialize(ufoScript);
+                    _uiManager.SubscribeOnDeath(presenter);
+                    presenter.OnDeath += HandleRetrnToPool;
+                    _subsribedComponents.Add(presenter);
                 }
             }
 

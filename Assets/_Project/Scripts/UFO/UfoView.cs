@@ -1,16 +1,23 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
 
 namespace Asteroids
 {
     [RequireComponent(typeof(Rigidbody2D), typeof(Transform))]
-    public class UfoView : MonoBehaviour
+    public class UfoView : MonoBehaviour, IHaveDeathConditions
     {
         public event Action OnDeath;
+        public event Action OnEnabled;
 
         public Transform ViewTransform { get; private set; }
 
         private Rigidbody2D _rb;
+
+        private void OnEnable()
+        {
+            OnEnabled?.Invoke();
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -29,6 +36,11 @@ namespace Asteroids
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
             _rb.AddForce(destination * moveSpeed, ForceMode2D.Impulse);
+        }
+
+        public void HandleDeath()
+        {
+            OnDeath?.Invoke();
         }
     }
 }

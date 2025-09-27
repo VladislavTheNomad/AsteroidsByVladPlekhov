@@ -1,15 +1,14 @@
 using System;
-using System.Collections;
+using System.Linq;
 using UnityEngine;
 using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerPresenter : MonoBehaviour, IInitializable, IHaveDeathConditions
+    public class PlayerPresenter : IHaveDeathConditions, ILateTickable, ITickable
     {
-        public event Action OnRechargeTimer;
-        public event Action OnAmountLaserShotChange;
         public event Action OnPlayerIsDead;
+        public event Action<float> OnRechargeTimer;
 
         private PlayerModel _model;
         private PlayerView _view;
@@ -21,9 +20,15 @@ namespace Asteroids
             _model = playermodel;
             _view = playerView;
             _uiManager = uiManager;
+
+            _view.MoveRequested += AddMove;
+            _view.RotateRequested += AddTorque;
+            _view.FireBulletRequested += FireBullet;
+            _view.FireLaserRequested += FireLaser;
+            _view.CollisionDetected += HandleDeath;
         }
 
-        private void LateUpdate()
+        public void LateTick()
         {
             Vector3 moveToPosition = _model.CheckBounds(_view.ViewTransform);
             if (moveToPosition != Vector3.zero)
@@ -33,13 +38,11 @@ namespace Asteroids
             UpdateUI();
         }
 
-        public void Initialize()
+        public void Tick()
         {
-            _view.MoveRequested += AddMove;
-            _view.RotateRequested += AddTorque;
-            _view.FireBulletRequested += FireBullet;
-            _view.FireLaserRequested += FireLaser;
-            _view.CollisionDetected += HandleDeath;
+            _model.CheckBulletRecharge(Time.deltaTime);
+            _model.CheckLaserRecharge(Time.deltaTime);
+            OnRechargeTimer?.Invoke(_model.LaserRechargeTimers.Min());
         }
 
         public void AddTorque(float direction)
@@ -55,22 +58,16 @@ namespace Asteroids
 
         public void FireBullet()
         {
-            bool doBulletFire = _model.FireBullet(_view.ViewTransform);
-
-            if (doBulletFire)
-            {
-                StartCoroutine(RechargeBullet());
-            }
+            _model.FireBullet(_view.ViewTransform);
         }
 
         public void FireLaser()
         {
-            _model.FireLaser(out bool canFire, out int slotIndex);
+            _model.FireLaser(out bool canFire);
 
             if (canFire)
             {
                 _view.ShowLaserVisual();
-                StartCoroutine(RechargeLazer(slotIndex));
                 _model.RayCastGo(_view.LeftBound, _view.ViewTransform);
                 _model.RayCastGo(_view.RightBound, _view.ViewTransform);
             }
@@ -78,47 +75,19 @@ namespace Asteroids
 
         public void HandleDeath()
         {
+            _view.MoveRequested -= AddMove;
+            _view.RotateRequested -= AddTorque;
+            _view.FireBulletRequested -= FireBullet;
+            _view.FireLaserRequested -= FireLaser;
+            _view.CollisionDetected -= HandleDeath;
+
             OnPlayerIsDead?.Invoke();
-        }
-
-        private IEnumerator RechargeBullet()
-        {
-            _model.SetCanFireBullet(false);
-            yield return new WaitForSeconds(_model.BulletRechargeTime);
-            _model.SetCanFireBullet(true);
-        }
-
-        private IEnumerator RechargeLazer(int index)
-        {
-            _model.LaserRechargeTimers[index] = _model.LaserRechargeTime;
-
-            while (_model.LaserRechargeTimers[index] > 0f)
-            {
-                _model.SubtractLazerRechargeTimer(index, Time.deltaTime);
-
-                OnRechargeTimer?.Invoke();
-                yield return null;
-            }
-            _model.SetLazerRechargeTimer(index, 0f);
-            _model.IncreaseLaserShots();
-            OnAmountLaserShotChange?.Invoke();
         }
 
         private void UpdateUI()
         {
             _uiManager.UpdateSpeed(_model.CurrentSpeed);
             _uiManager.UpdateCoordinates(_model.Position, _model.Rotation);
-        }
-
-        private void OnDestroy()
-        {
-            StopAllCoroutines();
-
-            _view.MoveRequested -= AddMove;
-            _view.RotateRequested -= AddTorque;
-            _view.FireBulletRequested -= FireBullet;
-            _view.FireLaserRequested -= FireLaser;
-            _view.CollisionDetected -= HandleDeath;
         }
     }
 }

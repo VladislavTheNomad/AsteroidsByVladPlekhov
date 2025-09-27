@@ -1,4 +1,3 @@
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -11,9 +10,7 @@ namespace Asteroids
     {
         private const int INITIAL_SCORE = 0;
         private const float TIME_SCALE_PAUSED = 0f;
-        private const float TIMER_THRESHOLD = 0f;
         private const int DECIMAL_PLACES_RECHARGE_TIMER = 2;
-        private const string DEFAULT_RECHARGE_TIMER_TEXT = "0";
         private const int DECIMAL_PLACES_COORDINATES = 2;
         private const int DECIMAL_PLACES_ANGLE = 1;
         private const int DECIMAL_PLACES_SPEED = 1;
@@ -95,18 +92,9 @@ namespace Asteroids
             Time.timeScale = TIME_SCALE_PAUSED;
         }
 
-        private void UpdateRechargeTimer()
+        private void UpdateRechargeTimer(float time)
         {
-            float[] timers = _playerModel.LaserRechargeTimers.Where(t => t > TIMER_THRESHOLD).ToArray();
-            if (timers.Length > 0)
-            {
-                float minRechargeCooldown = timers.Min();
-                _rechargeTimerText.text = $"{System.Math.Round(minRechargeCooldown, DECIMAL_PLACES_RECHARGE_TIMER)}";
-            }
-            else
-            {
-                _rechargeTimerText.text = DEFAULT_RECHARGE_TIMER_TEXT;
-            }
+            _rechargeTimerText.text = $"{System.Math.Round(time, DECIMAL_PLACES_RECHARGE_TIMER)}";
         }
 
         private void UpdateCurrentShot()

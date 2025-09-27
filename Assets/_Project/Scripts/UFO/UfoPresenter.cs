@@ -5,16 +5,15 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class UfoPresenter : MonoBehaviour, IGetPointsOnDestroy, IHaveDeathConditions
+    public class UfoPresenter : IGetPointsOnDestroy, IDisposable
     {
         public event Action<int> OnDeathTakeScore;
-        public event Action<UfoPresenter> OnDeath;
+        public event Action<UfoView> OnDeath;
 
-        [SerializeField] private UfoView _view;
 
+        private UfoView _view;
         private UfoModel _model;
         private bool _initialized;
-        private Vector3 _destination;
 
         [Inject]
         public void Construct(UfoModel model)
@@ -22,17 +21,11 @@ namespace Asteroids
             _model = model;
         }
 
-        private void OnEnable()
+        public void Initialize(UfoView view)
         {
-            if(_initialized)
-            {
-                ApplyBehaviour();
-            }
-        }
-
-        public void Initialize()
-        {
+            _view = view;
             _view.OnDeath += HandleDeath;
+            _view.OnEnabled += Starter;
             _view.Initialize();
             _initialized = true;
             ApplyBehaviour();
@@ -45,8 +38,8 @@ namespace Asteroids
                 await Task.Delay((int)(_model.GapBetweenPositionChanging * 1000));
                 if (_model.CheckNull(_view.ViewTransform))
                 {
-                    _destination = _model.GetNewDestination(_view.ViewTransform);
-                    _view.Move(_destination, _model.MoveSpeed);
+                    _model.GetNewDestination(_view.ViewTransform, out Vector3 destination, out float speed);
+                    _view.Move(destination, speed);
                 }
                 else
                 {
@@ -58,12 +51,24 @@ namespace Asteroids
         public void HandleDeath()
         {
             OnDeathTakeScore?.Invoke(_model.ScorePoints);
-            OnDeath?.Invoke(this);
+            OnDeath?.Invoke(_view);
         }
 
-        public void OnDestroy()
+        public void Dispose()
         {
-            _view.OnDeath -= HandleDeath;
+            if (_view != null)
+            {
+                _view.OnDeath -= HandleDeath;
+                _view.OnEnabled -= Starter;
+            }
+        }
+
+        private void Starter()
+        {
+            if (_initialized)
+            {
+                ApplyBehaviour();
+            }
         }
     }
 }

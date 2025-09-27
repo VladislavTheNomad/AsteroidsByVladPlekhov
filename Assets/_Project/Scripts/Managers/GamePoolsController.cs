@@ -11,9 +11,9 @@ namespace Asteroids
         [SerializeField, Range(1, 100)] private int _poolSize;
         [SerializeField] private GameObject _player;
 
-        private PoolManager<AsteroidPresenter> _asteroidPool;
-        private PoolManager<BulletPresenter> _bulletPool;
-        private PoolManager<UfoPresenter> _ufoPool;
+        private PoolManager<AsteroidView> _asteroidPool;
+        private PoolManager<BulletView> _bulletPool;
+        private PoolManager<UfoView> _ufoPool;
         private DiContainer _container;
 
         [Inject]
@@ -31,13 +31,13 @@ namespace Asteroids
 
         public void Initialize()
         {
-            _asteroidPool = new PoolManager<AsteroidPresenter>(_prefabAsteroid, _poolSize, _container);
-            _bulletPool = new PoolManager<BulletPresenter>(_prefabBullet, _poolSize, _container);
-            _ufoPool = new PoolManager<UfoPresenter>(_prefabUFO, _poolSize, _container);
+            _asteroidPool = new PoolManager<AsteroidView>(_prefabAsteroid, _poolSize, _container);
+            _bulletPool = new PoolManager<BulletView>(_prefabBullet, _poolSize, _container);
+            _ufoPool = new PoolManager<UfoView>(_prefabUFO, _poolSize, _container);
         }
 
-        public PoolManager<AsteroidPresenter> GetAsteroidPool() => _asteroidPool;
-        public PoolManager<BulletPresenter> GetBulletPool() => _bulletPool;
-        public PoolManager<UfoPresenter> GetUFOPool() => _ufoPool;
+        public PoolManager<AsteroidView> GetAsteroidPool() => _asteroidPool;
+        public PoolManager<BulletView> GetBulletPool() => _bulletPool;
+        public PoolManager<UfoView> GetUFOPool() => _ufoPool;
     }
 }

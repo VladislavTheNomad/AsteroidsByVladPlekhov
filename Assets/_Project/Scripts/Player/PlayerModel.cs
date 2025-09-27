@@ -24,7 +24,6 @@ namespace Asteroids
         public float BulletRechargeTime { get; private set; }
         public float LaserRechargeTime { get; private set; }
         public float[] LaserRechargeTimers { get; private set; }
-        public bool CanFireBullet { get; private set; }
         public LayerMask DestructableLayers { get; private set; }
 
         private Vector3 _bottomLeft;
@@ -33,13 +32,15 @@ namespace Asteroids
         private GamePoolsController _gamePoolsController;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 
+        private bool _isBulletRecharging;
+        private float _rechargeBulletTimer = 0f;
+
         public PlayerModel(PlayerConfig playerConfig, Camera camera, GamePoolsController gamePoolsController)
         {
             Position = Vector3.zero;
             Rotation = 0f;
             CurrentSpeed = 0f;
             LaserShots = MAX_LASER_SHOTS;
-            CanFireBullet = true;
             LaserRechargeTimers = new float[MAX_LASER_SHOTS];
             for (int i = 0; i < LaserRechargeTimers.Length; i++)
             {
@@ -56,6 +57,38 @@ namespace Asteroids
 
             _bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector2(0, 0));
             _topRight = _mainCamera.ViewportToWorldPoint(new Vector2(1, 1));
+        }
+
+        public void CheckBulletRecharge(float deltaTime)
+        {
+            if (_isBulletRecharging)
+            {
+                _rechargeBulletTimer += deltaTime;
+                if (_rechargeBulletTimer >= BulletRechargeTime)
+                {
+                    _rechargeBulletTimer = 0f;
+                    _isBulletRecharging = false;
+                }
+            }
+        }
+
+        public void CheckLaserRecharge(float deltaTime)
+        {
+            if (LaserShots >= MAX_LASER_SHOTS) return;
+            
+            for (int i = 0; i < LaserRechargeTimers.Length; i++)
+            {
+                if (LaserRechargeTimers[i] > 0f)
+                {
+                    LaserRechargeTimers[i] -= deltaTime;
+
+                    if(LaserRechargeTimers[i] <= 0f)
+                    {
+                        LaserRechargeTimers[i] = 0f;
+                        IncreaseLaserShots();
+                    }
+                }
+            }
         }
 
         public Vector3 CheckBounds(Transform transform)
@@ -95,37 +128,46 @@ namespace Asteroids
             return Vector3.zero;
         }
 
-        public bool FireBullet(Transform transform)
+        public void FireBullet(Transform transform)
         {
-            if (CanFireBullet)
+            if (!_isBulletRecharging)
             {
                 SpawnBullet(transform);
-                return true;
+                _isBulletRecharging = true;
             }
-            return false;
         }
 
         public void SpawnBullet(Transform transform)
         {
-            BulletPresenter bulletSpawn = _gamePoolsController.GetBulletPool().Get();
+            BulletView bulletSpawn = _gamePoolsController.GetBulletPool().Get();
             bulletSpawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
             bulletSpawn.gameObject.SetActive(true);
         }
 
-        public void FireLaser(out bool canFire, out int slotIndex)
+        public void FireLaser(out bool canFire)
         {
             if (LaserShots > 0)
             {
-                slotIndex = LaserShots - 1;
-                DecreaseLaserShots();
-                OnAmountLaserShotChange?.Invoke();
-                canFire = true;
+                int rechargeSlotIndex = -1;
+                for (int i = 0; i < MAX_LASER_SHOTS; i++)
+                {
+                    if (LaserRechargeTimers[i] <= 0f)
+                    {
+                        rechargeSlotIndex = i;
+                        break;
+                    }
+                }
+
+                if (rechargeSlotIndex != -1)
+                {
+                    LaserRechargeTimers[rechargeSlotIndex] = LaserRechargeTime;
+                    DecreaseLaserShots();
+                    canFire = true;
+                    return;
+                }
             }
-            else
-            {
-                canFire = false;
-                slotIndex = -1;
-            }
+
+            canFire = false;
         }
 
         public void RayCastGo(GameObject bound, Transform transform)
@@ -141,52 +183,39 @@ namespace Asteroids
             }
         }
 
-        public void UpdatePosition(Vector3 newPosition)
-        {
-            Position = newPosition;
-        }
-
-        public void UpdateRotation(float newRotation)
-        {
-            Rotation = newRotation;
-        }
-
         public void UpdateSpeed(float newSpeed)
         {
             CurrentSpeed = newSpeed;
         }
 
-        public void IncreaseLaserShots()
+        public int GetMaxLaserShots() => MAX_LASER_SHOTS;
+
+        private void UpdatePosition(Vector3 newPosition)
+        {
+            Position = newPosition;
+        }
+
+        private void UpdateRotation(float newRotation)
+        {
+            Rotation = newRotation;
+        }
+
+        private void IncreaseLaserShots()
         {
             if (LaserShots < MAX_LASER_SHOTS)
             {
                 LaserShots++;
+                OnAmountLaserShotChange?.Invoke();
             }
         }
 
-        public void DecreaseLaserShots()
+        private void DecreaseLaserShots()
         {
             if (LaserShots > 0)
             {
                 LaserShots--;
+                OnAmountLaserShotChange?.Invoke();
             }
         }
-
-        public void SetCanFireBullet(bool canFire)
-        {
-            CanFireBullet = canFire;
-        }
-
-        public void SetLazerRechargeTimer(int index, float value)
-        {
-            LaserRechargeTimers[index] = value;
-        }
-
-        public void SubtractLazerRechargeTimer(int index, float value)
-        {
-            LaserRechargeTimers[index] -= value;
-        }
-
-        public int GetMaxLaserShots() => MAX_LASER_SHOTS;
     }
 }

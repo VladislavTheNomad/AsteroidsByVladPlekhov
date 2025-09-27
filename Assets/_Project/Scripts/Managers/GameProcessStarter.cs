@@ -37,7 +37,7 @@ namespace Asteroids
             while (true)
             {
                 yield return _ufoSpawnDelay;
-                UfoPresenter newUFO = _poolManager.GetUFOPool().Get();
+                UfoView newUFO = _poolManager.GetUFOPool().Get();
                 Vector2 spawnPosition = _utilsMakeRandomStartPosition.GetRandomSpawnPosition();
                 newUFO.gameObject.transform.position = spawnPosition;
                 newUFO.gameObject.SetActive(true);
@@ -49,8 +49,8 @@ namespace Asteroids
             yield return null;
             while (true)
             {
-                AsteroidPresenter newAsteroid = _poolManager.GetAsteroidPool().Get();
-                newAsteroid.SetStartConditions();
+                AsteroidView newAsteroid = _poolManager.GetAsteroidPool().Get();
+                newAsteroid.SetNewAsteroid();
                 yield return _asteroidSpawnDelay;
             }
         }

@@ -1,67 +1,60 @@
 using System;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
 namespace Asteroids
 {
-    public class BulletPresenter : MonoBehaviour, IInitializable, IHaveDeathConditions
+    public class BulletPresenter : IHaveDeathConditions, IDisposable
     {
-        public event Action<BulletPresenter> OnDeath;
+        public event Action<BulletView> OnDeath;
 
-        [SerializeField] private BulletView _bulletView;
-
-        private BulletModel _bulletModel;
-        private WaitForSeconds _bulletLifeSpan;
-        private Coroutine _coroutine;
+        private BulletModel _model;
+        private BulletView _view;
 
         [Inject]
         public void Construct(BulletModel bm)
         {
-            _bulletModel = bm;
+            _model = bm;
         }
 
-        public void Initialize()
+        public void Dispose()
         {
-            _bulletLifeSpan = new WaitForSeconds(_bulletModel.BulletsLifeTime);
-
-            _bulletView.OnHit += HandleDeath;
-            _bulletView.OnEnabled += StartLifeTime;
-            _bulletView.OnDisabled += OnDisable;
-            _bulletView.Initialize();
-        }
-
-        public void StartLifeTime()
-        {
-            if (_coroutine == null)
+            if (_view != null)
             {
-                StartCoroutine(LifeTime());
+                _view.OnHit -= HandleDeath;
+                _view.OnEnabled -= Starter;
+            }
+        }
+
+        public void Initialize(BulletView view)
+        {
+            _view = view;
+            _view.OnHit += HandleDeath;
+            _view.OnEnabled += Starter;
+            _view.Initialize();
+        }
+
+        public async void StartLifeTime()
+        {
+            _view.MoveBullet(_model.MoveSpeed);
+            await Task.Delay((int)(1000 * _model.BulletsLifeTime));
+            if(_view != null)
+            {
+                HandleDeath();
             }
         }
 
         public void HandleDeath()
         {
-            _bulletView.StopBulletMovement();
-            OnDeath?.Invoke(this);
+            _view.StopBulletMovement();
+            OnDeath?.Invoke(_view);
         }
 
-        private IEnumerator LifeTime()
+        private void Starter()
         {
-            _bulletView.MoveBullet(_bulletModel.MoveSpeed);
-            yield return _bulletLifeSpan;
-            HandleDeath();
-        }
-
-        private void OnDisable()
-        {
-            StopAllCoroutines();
-        }
-
-        private void OnDestroy()
-        {
-            _bulletView.OnHit -= HandleDeath;
-            _bulletView.OnEnabled -= StartLifeTime;
-            _bulletView.OnDisabled -= OnDisable;
+            StartLifeTime();
         }
     }
 }

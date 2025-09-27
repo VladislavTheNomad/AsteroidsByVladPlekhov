@@ -45,7 +45,14 @@ namespace Asteroids
         public Vector3 CheckBounds(Transform transform)
         {
             Vector3 viewportPos = _mainCamera.WorldToViewportPoint(transform.position);
-            if (viewportPos.x < SCREEN_LEFT_BOUND - HEIGHT_BUFFER || viewportPos.x > SCREEN_RIGHT_BOUND + HEIGHT_BUFFER || viewportPos.y > SCREEN_TOP_BOUND + WIDTH_BUFFER || viewportPos.y < SCREEN_BOTTOM_BOUND - WIDTH_BUFFER)
+            bool isOutOfBounds =
+        viewportPos.x < SCREEN_LEFT_BOUND - HEIGHT_BUFFER ||
+        viewportPos.x > SCREEN_RIGHT_BOUND + HEIGHT_BUFFER ||
+        viewportPos.y > SCREEN_TOP_BOUND + WIDTH_BUFFER ||
+        viewportPos.y < SCREEN_BOTTOM_BOUND - WIDTH_BUFFER;
+
+
+            if (isOutOfBounds)
             {
                 Vector3 newPosition = transform.position;
 
@@ -77,20 +84,21 @@ namespace Asteroids
             spawnPosition = _utils.GetRandomSpawnPosition();
         }
 
-        public void GetSmaller(Vector3 parentScale, float currentAcceleration, out float newAcceleration, out Vector3 newScale)
+        public void GetSmaller(Transform parentTransform, float currentAcceleration, out float newAcceleration, out Vector3 newScale)
         {
             newAcceleration = AddAcceleration(currentAcceleration);
-            newScale = parentScale;
+            newScale = parentTransform.localScale;
             newScale.x *= SCALE_REDUCE;
             newScale.y *= SCALE_REDUCE;
         }
 
-        public void MakeSmallerAsteroids(int paretnSizeLevel, Transform parentTransform)
+        public void MakeSmallerAsteroids(int parentSizeLevel, Transform parentTransform)
         {
             for (int i = 0; i < SmallAsteroidQuantity; i++)
             {
-                AsteroidPresenter smallAsteroid = _poolManager.GetAsteroidPool().Get();
-                smallAsteroid.GetSmaller(paretnSizeLevel, parentTransform);
+                AsteroidView smallAsteroid = _poolManager.GetAsteroidPool().Get();
+                smallAsteroid.transform.position = parentTransform.position;
+                smallAsteroid.GetSmaller(parentSizeLevel, parentTransform);
             }
         }
 

@@ -4,13 +4,12 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class AsteroidPresenter : MonoBehaviour, IGetPointsOnDestroy, IHaveDeathConditions
+    public class AsteroidPresenter : IGetPointsOnDestroy, IDisposable
     {
         public event Action<int> OnDeathTakeScore;
-        public event Action<AsteroidPresenter> OnDeath;
+        public event Action<AsteroidView> OnDeath;
 
-        [SerializeField] private AsteroidView _view;
-
+        private AsteroidView _view;
         private AsteroidModel _model;
         private float _acceleration = 1f;
         private bool _initialized;
@@ -23,21 +22,16 @@ namespace Asteroids
             _model = model;
         }
 
-        private void OnEnable()
+        public void Initialize(AsteroidView newView)
         {
-            if (_initialized)
-            {
-                SetupMovement();
-            }
-        }
-
-        public void Initialize()
-        {
+            _view = newView;
             _view.OnDeath += DestroyAsteroid;
             _view.OnMovement += CheckBounds;
+            _view.OnSetNew += SetStartConditions;
+            _view.OnEnabled += Starter;
+            _view.OnGetSmaller += GetSmaller;
             _view.Initialize();
             _initialized = true;
-            SetupMovement();
         }
 
         public void SetStartConditions()
@@ -60,10 +54,11 @@ namespace Asteroids
 
         public void GetSmaller(int parentSizeLevel, Transform parentTransform)
         {
-            SetCurrentSizeLevel(parentSizeLevel - 1);
-            _model.GetSmaller(parentTransform.localScale, _acceleration, out float newAcceleration, out Vector3 newScale);
+            AsteroidCurrentSizeLevel = parentSizeLevel - 1;
+            _model.GetSmaller(parentTransform, _acceleration, out float newAcceleration, out Vector3 newScale);
+            _acceleration = newAcceleration;
             _view.SetScale(newScale);
-            _view.SetNewPosition(parentTransform.position);
+            _view.SetNewPosition(_view.Transform.position);
             _view.SetActive();
         }
 
@@ -72,12 +67,8 @@ namespace Asteroids
             if (AsteroidCurrentSizeLevel > 1)
             {
                 _model.MakeSmallerAsteroids(AsteroidCurrentSizeLevel, _view.Transform);
-                HandleDeath();
             }
-            else
-            {
-                HandleDeath();
-            }
+            HandleDeath();
         }
 
         public void SetCurrentSizeLevel(int level)
@@ -85,17 +76,37 @@ namespace Asteroids
             AsteroidCurrentSizeLevel = level;
         }
 
+        public void HandleDeath()
+        {
+            OnDeathTakeScore?.Invoke(_model.ScorePoints);
+            OnDeath?.Invoke(_view);
+            AsteroidCurrentSizeLevel = _model.MaxSizeLevel;
+        }
+
+        public void Dispose()
+        {
+            if (_view != null)
+            {
+                _view.OnDeath -= DestroyAsteroid;
+                _view.OnMovement -= CheckBounds;
+                _view.OnSetNew -= SetStartConditions;
+                _view.OnEnabled -= Starter;
+                _view.OnGetSmaller -= GetSmaller;
+            }
+        }
+
+        private void Starter()
+        {
+            if (_initialized)
+            {
+                SetupMovement();
+            }
+        }
+
         private void SetupMovement()
         {
             _model.SetMovingDestination(_view.Transform, out float startImpulse, out Vector3 destinationPoint);
             _view.Move(destinationPoint, startImpulse, _acceleration);
-        }
-
-        public void HandleDeath()
-        {
-            OnDeathTakeScore?.Invoke(_model.ScorePoints);
-            OnDeath?.Invoke(this);
-            AsteroidCurrentSizeLevel = _model.MaxSizeLevel;
         }
     }
 }

@@ -6,7 +6,7 @@ using Zenject;
 namespace Asteroids
 {
     [RequireComponent(typeof(LineRenderer), typeof(Rigidbody2D), typeof(Transform))]
-    public class PlayerView : MonoBehaviour, IInitializable
+    public class PlayerView : MonoBehaviour, IInitializable, IDisposable
     {
         private const float LASER_WIDTH = 0.2f;
         private const float LASER_DURATION = 0.25f;
@@ -134,6 +134,23 @@ namespace Asteroids
         private void OnDestroy()
         {
             StopAllCoroutines();
+        }
+
+        public void Dispose()
+        {
+            if (_playerControls == null) return;
+
+            _playerControls.Player.Disable();
+
+            _playerControls.Player.Move.performed -= context => _moveInput = context.ReadValue<float>();
+            _playerControls.Player.Move.canceled -= context => _moveInput = 0f;
+            _playerControls.Player.Rotate.performed -= context => _rotateInput = context.ReadValue<float>();
+            _playerControls.Player.Rotate.canceled -= context => _rotateInput = 0f;
+
+            _playerControls.Player.ShootBullet.performed -= context => _shootBulletInput = 1f;
+            _playerControls.Player.ShootBullet.canceled -= context => _shootBulletInput = 0f;
+
+            _playerControls.Player.ShootLaser.started -= context => ShootLaser();
         }
     }
 }

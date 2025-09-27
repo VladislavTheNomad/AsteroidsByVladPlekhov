@@ -4,14 +4,22 @@ using UnityEngine;
 namespace Asteroids
 {
     [RequireComponent(typeof(Rigidbody2D), typeof(Transform))]
-    public class AsteroidView : MonoBehaviour
+    public class AsteroidView : MonoBehaviour, IHaveDeathConditions
     {
         public event Action OnDeath;
         public event Action OnMovement;
+        public event Action OnEnabled;
+        public event Action OnSetNew;
+        public event Action<int, Transform> OnGetSmaller;
 
         public Transform Transform { get; private set; }
 
         private Rigidbody2D _rb;
+
+        private void OnEnable()
+        {
+            OnEnabled?.Invoke();
+        }
 
         private void OnTriggerEnter2D(Collider2D other)
         {
@@ -28,6 +36,16 @@ namespace Asteroids
         {
             _rb = GetComponent<Rigidbody2D>();
             Transform = GetComponent<Transform>();
+        }
+
+        public void SetNewAsteroid()
+        {
+            OnSetNew?.Invoke();
+        }
+
+        public void GetSmaller(int parentSizeLevel, Transform parentTransform)
+        {
+            OnGetSmaller?.Invoke(parentSizeLevel, parentTransform);
         }
 
         public void Move(Vector3 destination, float impulse, float acceleration)
@@ -48,6 +66,11 @@ namespace Asteroids
         public void SetActive()
         {
             gameObject.SetActive(true);
+        }
+
+        public void HandleDeath()
+        {
+            OnDeath?.Invoke();
         }
     }
 }
