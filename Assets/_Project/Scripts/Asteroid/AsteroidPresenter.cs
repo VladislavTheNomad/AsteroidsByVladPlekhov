@@ -7,7 +7,7 @@ namespace Asteroids
     public class AsteroidPresenter : IGetPointsOnDestroy, IDisposable
     {
         public event Action<int> OnDeathTakeScore;
-        public event Action<AsteroidView> OnDeath;
+        public event Action OnDeath;
 
         private AsteroidView _view;
         private AsteroidModel _model;
@@ -32,6 +32,7 @@ namespace Asteroids
             _view.OnGetSmaller += GetSmaller;
             _view.Initialize();
             _initialized = true;
+            Starter();
         }
 
         public void SetStartConditions()
@@ -79,7 +80,7 @@ namespace Asteroids
         public void HandleDeath()
         {
             OnDeathTakeScore?.Invoke(_model.ScorePoints);
-            OnDeath?.Invoke(_view);
+            OnDeath?.Invoke();
             AsteroidCurrentSizeLevel = _model.MaxSizeLevel;
         }
 

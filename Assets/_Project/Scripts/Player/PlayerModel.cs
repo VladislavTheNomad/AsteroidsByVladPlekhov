@@ -29,13 +29,13 @@ namespace Asteroids
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
         private Camera _mainCamera;
-        private GamePoolsController _gamePoolsController;
+        private BulletFactory _bulletFactory;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 
         private bool _isBulletRecharging;
         private float _rechargeBulletTimer = 0f;
 
-        public PlayerModel(PlayerConfig playerConfig, Camera camera, GamePoolsController gamePoolsController)
+        public PlayerModel(PlayerConfig playerConfig, Camera camera, BulletFactory bulletFactory)
         {
             Position = Vector3.zero;
             Rotation = 0f;
@@ -53,7 +53,7 @@ namespace Asteroids
             LaserRechargeTime = playerConfig.LaserRechargeTime;
             DestructableLayers = playerConfig.DestructableLayers;
             _mainCamera = camera;
-            _gamePoolsController = gamePoolsController;
+            _bulletFactory = bulletFactory;
 
             _bottomLeft = _mainCamera.ViewportToWorldPoint(new Vector2(0, 0));
             _topRight = _mainCamera.ViewportToWorldPoint(new Vector2(1, 1));
@@ -139,9 +139,7 @@ namespace Asteroids
 
         public void SpawnBullet(Transform transform)
         {
-            BulletView bulletSpawn = _gamePoolsController.GetBulletPool().Get();
-            bulletSpawn.transform.SetPositionAndRotation(transform.position, transform.rotation);
-            bulletSpawn.gameObject.SetActive(true);
+            BulletView bulletSpawn = _bulletFactory.GetBulletFromPool(transform);
         }
 
         public void FireLaser(out bool canFire)

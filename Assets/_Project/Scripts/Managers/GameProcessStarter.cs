@@ -12,14 +12,16 @@ namespace Asteroids
 
         private WaitForSeconds _asteroidSpawnDelay;
         private WaitForSeconds _ufoSpawnDelay;
-        private GamePoolsController _poolManager;
         private UtilsCalculatePositions _utilsMakeRandomStartPosition;
+        private AsteroidFactory _asteroidFactory;
+        private UfoFactory _ufoFactory;
 
         [Inject]
-        public void Construct(DiContainer container)
+        public void Construct(UtilsCalculatePositions utils, AsteroidFactory asteroidFactory, UfoFactory ufoFactory)
         {
-            _utilsMakeRandomStartPosition = container.TryResolve<UtilsCalculatePositions>();
-            _poolManager = container.TryResolve<GamePoolsController>();
+            _utilsMakeRandomStartPosition = utils;
+            _asteroidFactory = asteroidFactory;
+            _ufoFactory = ufoFactory;
         }
 
         public void Initialize()
@@ -37,10 +39,9 @@ namespace Asteroids
             while (true)
             {
                 yield return _ufoSpawnDelay;
-                UfoView newUFO = _poolManager.GetUFOPool().Get();
+                UfoView newUFO = _ufoFactory.GetUfoFromPool();
                 Vector2 spawnPosition = _utilsMakeRandomStartPosition.GetRandomSpawnPosition();
                 newUFO.gameObject.transform.position = spawnPosition;
-                newUFO.gameObject.SetActive(true);
             }
         }
 
@@ -49,7 +50,7 @@ namespace Asteroids
             yield return null;
             while (true)
             {
-                AsteroidView newAsteroid = _poolManager.GetAsteroidPool().Get();
+                AsteroidView newAsteroid = _asteroidFactory.GetAsteroidFromPool();
                 newAsteroid.SetNewAsteroid();
                 yield return _asteroidSpawnDelay;
             }

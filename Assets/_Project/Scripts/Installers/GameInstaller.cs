@@ -5,7 +5,6 @@ namespace Asteroids
 {
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField] private GamePoolsController _gamePoolsController;
         [SerializeField] private UIManager _uiManager;
         [SerializeField] private GameProcessStarter _gameProcessStarter;
         [SerializeField] private Camera _camera;
@@ -17,10 +16,33 @@ namespace Asteroids
         [SerializeField] private AsteroidConfig _asteroidConfig;
         [SerializeField] private UFOConfig _ufoConfig;
 
+        [SerializeField] private GameObject _asteroidPrefab;
+        [SerializeField] private GameObject _bulletPrefab;
+        [SerializeField] private GameObject _ufoPrefab;
+        [SerializeField] private int _poolSize;
+
         public override void InstallBindings()
         {
+            Container.BindMemoryPool<AsteroidView, AsteroidPool>().
+                WithInitialSize(_poolSize).
+                FromComponentInNewPrefab(_asteroidPrefab).
+                UnderTransformGroup("Asteroids");
+
+            Container.BindMemoryPool<BulletView, BulletPool>().
+                WithInitialSize(_poolSize).
+                FromComponentInNewPrefab(_bulletPrefab).
+                UnderTransformGroup("Bullets");
+
+            Container.BindMemoryPool<UfoView, UfoPool>().
+                WithInitialSize(_poolSize).
+                FromComponentInNewPrefab(_ufoPrefab).
+                UnderTransformGroup("UFO's");
+
+            Container.Bind<AsteroidFactory>().AsSingle();
+            Container.Bind<BulletFactory>().AsSingle();
+            Container.Bind<UfoFactory>().AsSingle();
+
             Container.BindInterfacesAndSelfTo<UIManager>().FromInstance(_uiManager).AsSingle();
-            Container.BindInterfacesAndSelfTo<GamePoolsController>().FromInstance(_gamePoolsController).AsSingle();
             Container.BindInterfacesAndSelfTo<GameProcessStarter>().FromInstance(_gameProcessStarter).AsSingle();
 
             Container.Bind<PlayerModel>().AsSingle().WithArguments(_playerConfig).NonLazy();

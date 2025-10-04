@@ -8,7 +8,7 @@ namespace Asteroids
     public class UfoPresenter : IGetPointsOnDestroy, IDisposable
     {
         public event Action<int> OnDeathTakeScore;
-        public event Action<UfoView> OnDeath;
+        public event Action OnDeath;
 
 
         private UfoView _view;
@@ -51,7 +51,7 @@ namespace Asteroids
         public void HandleDeath()
         {
             OnDeathTakeScore?.Invoke(_model.ScorePoints);
-            OnDeath?.Invoke(_view);
+            OnDeath?.Invoke();
         }
 
         public void Dispose()

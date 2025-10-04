@@ -21,11 +21,11 @@ namespace Asteroids
 
         private Camera _mainCamera;
         private UtilsCalculatePositions _utils;
-        private GamePoolsController _poolManager;
+        private AsteroidFactory _factory;
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
 
-        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utilsCalculatePositions, GamePoolsController poolsController)
+        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utilsCalculatePositions, AsteroidFactory factory)
         {
             MaxMoveSpeed = asteroidConfig.MaxMoveSpeed;
             MinMoveSpeed = asteroidConfig.MinMoveSpeed;
@@ -36,7 +36,7 @@ namespace Asteroids
 
             _mainCamera = camera;
             _utils = utilsCalculatePositions;
-            _poolManager = poolsController;
+            _factory = factory;
 
             _bottomLeft = _mainCamera.ViewportToWorldPoint(Vector2.zero);
             _topRight = _mainCamera.ViewportToWorldPoint(Vector2.one);
@@ -96,7 +96,7 @@ namespace Asteroids
         {
             for (int i = 0; i < SmallAsteroidQuantity; i++)
             {
-                AsteroidView smallAsteroid = _poolManager.GetAsteroidPool().Get();
+                AsteroidView smallAsteroid = _factory.GetAsteroidFromPool();
                 smallAsteroid.transform.position = parentTransform.position;
                 smallAsteroid.GetSmaller(parentSizeLevel, parentTransform);
             }

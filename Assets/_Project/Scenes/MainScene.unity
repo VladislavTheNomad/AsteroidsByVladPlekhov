@@ -924,17 +924,12 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!1 &643207601 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 3319278424066732139, guid: 4528138b3417a3547a1de6830a9c050f, type: 3}
-  m_PrefabInstance: {fileID: 6544308946594936349}
-  m_PrefabAsset: {fileID: 0}
 --- !u!114 &643207602 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3908750840605295985, guid: 4528138b3417a3547a1de6830a9c050f, type: 3}
   m_PrefabInstance: {fileID: 6544308946594936349}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 643207601}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6ffee9369dbaac342bb6794624776a8b, type: 3}
@@ -1472,7 +1467,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d45ba36ef41f9934a80d40888538ff0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gamePoolsController: {fileID: 1470690251}
   _uiManager: {fileID: 1819972967}
   _gameProcessStarter: {fileID: 734819092}
   _camera: {fileID: 1396529298}
@@ -1481,6 +1475,10 @@ MonoBehaviour:
   _bulletConfig: {fileID: 1340252795}
   _asteroidConfig: {fileID: 1830503617}
   _ufoConfig: {fileID: 86796155}
+  _asteroidPrefab: {fileID: 4265792025796565592, guid: 0ed864b98be16a8448933a4cff2f7515, type: 3}
+  _bulletPrefab: {fileID: 2741215976847407681, guid: 3956660c1f071fb459bdce6118f94cd1, type: 3}
+  _ufoPrefab: {fileID: 5821226311079335962, guid: f4f4cf82b36f79741bf5e5ccd0cc9733, type: 3}
+  _poolSize: 10
 --- !u!1 &966482012
 GameObject:
   m_ObjectHideFlags: 0
@@ -1646,7 +1644,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1470690250}
   - {fileID: 1113540525}
   - {fileID: 1819972966}
   - {fileID: 734819091}
@@ -2764,55 +2761,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1408529176}
   m_CullTransparentMesh: 1
---- !u!1 &1470690249
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1470690250}
-  - component: {fileID: 1470690251}
-  m_Layer: 0
-  m_Name: PoolController
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1470690250
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1470690249}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1011902578}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1470690251
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1470690249}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f2c6ea0098d901d4498a007a1d48228b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _prefabBullet: {fileID: 2741215976847407681, guid: 3956660c1f071fb459bdce6118f94cd1, type: 3}
-  _prefabAsteroid: {fileID: 4265792025796565592, guid: 0ed864b98be16a8448933a4cff2f7515, type: 3}
-  _prefabUFO: {fileID: 5821226311079335962, guid: f4f4cf82b36f79741bf5e5ccd0cc9733, type: 3}
-  _poolSize: 10
-  _player: {fileID: 643207601}
 --- !u!1 &1581429831
 GameObject:
   m_ObjectHideFlags: 0
