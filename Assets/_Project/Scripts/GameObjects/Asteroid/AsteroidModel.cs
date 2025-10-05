@@ -4,12 +4,6 @@ namespace Asteroids
 {
     public class AsteroidModel
     {
-        private const float HEIGHT_BUFFER = 0.2f;
-        private const float WIDTH_BUFFER = 0.3f;
-        private const float SCREEN_RIGHT_BOUND = 1f;
-        private const float SCREEN_LEFT_BOUND = 0f;
-        private const float SCREEN_TOP_BOUND = 1f;
-        private const float SCREEN_BOTTOM_BOUND = 0f;
         private const float SCALE_REDUCE = 0.5f;
 
         public float MaxMoveSpeed { get; private set; }
@@ -44,38 +38,7 @@ namespace Asteroids
 
         public Vector3 CheckBounds(Transform transform)
         {
-            Vector3 viewportPos = _mainCamera.WorldToViewportPoint(transform.position);
-            bool isOutOfBounds =
-        viewportPos.x < SCREEN_LEFT_BOUND - HEIGHT_BUFFER ||
-        viewportPos.x > SCREEN_RIGHT_BOUND + HEIGHT_BUFFER ||
-        viewportPos.y > SCREEN_TOP_BOUND + WIDTH_BUFFER ||
-        viewportPos.y < SCREEN_BOTTOM_BOUND - WIDTH_BUFFER;
-
-
-            if (isOutOfBounds)
-            {
-                Vector3 newPosition = transform.position;
-
-                if (viewportPos.x > SCREEN_RIGHT_BOUND)
-                {
-                    newPosition.x = _bottomLeft.x;
-                }
-                else if (viewportPos.x < SCREEN_LEFT_BOUND)
-                {
-                    newPosition.x = _topRight.x;
-                }
-
-                if (viewportPos.y > SCREEN_TOP_BOUND)
-                {
-                    newPosition.y = _bottomLeft.y;
-                }
-                else if (viewportPos.y < SCREEN_BOTTOM_BOUND)
-                {
-                    newPosition.y = _topRight.y;
-                }
-                return newPosition;
-            }
-            return Vector3.zero;
+            return _utils.CheckBounds(transform);
         }
 
         public void CalculateStartPosition(out int sizeLevelAtStart, out Vector2 spawnPosition)

@@ -15,6 +15,7 @@ namespace Asteroids
         public Transform Transform { get; private set; }
 
         private Rigidbody2D _rb;
+        private bool _isPaused;
 
         private void OnEnable()
         {

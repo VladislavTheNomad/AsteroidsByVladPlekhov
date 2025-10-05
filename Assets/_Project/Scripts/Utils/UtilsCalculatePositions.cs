@@ -5,6 +5,12 @@ namespace Asteroids
 {
     public class UtilsCalculatePositions : IInitializable
     {
+        private const float HEIGHT_BUFFER = 0.2f;
+        private const float WIDTH_BUFFER = 0.3f;
+        private const float SCREEN_RIGHT_BOUND = 1f;
+        private const float SCREEN_LEFT_BOUND = 0f;
+        private const float SCREEN_TOP_BOUND = 1f;
+        private const float SCREEN_BOTTOM_BOUND = 0f;
         private const int NUMBER_OF_SCREEN_SIDES = 4;
         private const int SPAWN_OFFSET = 10;
 
@@ -25,6 +31,42 @@ namespace Asteroids
             _topRight = _camera.ViewportToWorldPoint(Vector2.one);
             _widthScreen = _topRight.x - _bottomLeft.x;
             _heightScreen = _topRight.y - _bottomLeft.y;
+        }
+
+        public Vector3 CheckBounds(Transform transform)
+        {
+            Vector3 viewportPos = _camera.WorldToViewportPoint(transform.position);
+            bool isOutOfBounds =
+        viewportPos.x < SCREEN_LEFT_BOUND - HEIGHT_BUFFER ||
+        viewportPos.x > SCREEN_RIGHT_BOUND + HEIGHT_BUFFER ||
+        viewportPos.y > SCREEN_TOP_BOUND + WIDTH_BUFFER ||
+        viewportPos.y < SCREEN_BOTTOM_BOUND - WIDTH_BUFFER;
+
+
+            if (isOutOfBounds)
+            {
+                Vector3 newPosition = transform.position;
+
+                if (viewportPos.x > SCREEN_RIGHT_BOUND)
+                {
+                    newPosition.x = _bottomLeft.x;
+                }
+                else if (viewportPos.x < SCREEN_LEFT_BOUND)
+                {
+                    newPosition.x = _topRight.x;
+                }
+
+                if (viewportPos.y > SCREEN_TOP_BOUND)
+                {
+                    newPosition.y = _bottomLeft.y;
+                }
+                else if (viewportPos.y < SCREEN_BOTTOM_BOUND)
+                {
+                    newPosition.y = _topRight.y;
+                }
+                return newPosition;
+            }
+            return Vector3.zero;
         }
 
         public Vector2 GetRandomSpawnPosition()

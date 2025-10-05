@@ -12,10 +12,10 @@ namespace Asteroids
 
         private PlayerModel _model;
         private PlayerView _view;
-        private UIManager _uiManager;
+        private GameHUDManager _uiManager;
 
         [Inject]
-        public void Construct(PlayerModel playermodel, PlayerView playerView, UIManager uiManager)
+        public void Construct(PlayerModel playermodel, PlayerView playerView, GameHUDManager uiManager)
         {
             _model = playermodel;
             _view = playerView;
@@ -26,6 +26,8 @@ namespace Asteroids
             _view.FireBulletRequested += FireBullet;
             _view.FireLaserRequested += FireLaser;
             _view.CollisionDetected += HandleDeath;
+
+            _uiManager.SetMaxLaserShots(_model.GetMaxLaserShots());
         }
 
         public void LateTick()
@@ -75,6 +77,7 @@ namespace Asteroids
 
         public void HandleDeath()
         {
+            _view.Dispose();
             _view.MoveRequested -= AddMove;
             _view.RotateRequested -= AddTorque;
             _view.FireBulletRequested -= FireBullet;
@@ -82,10 +85,12 @@ namespace Asteroids
             _view.CollisionDetected -= HandleDeath;
 
             OnPlayerIsDead?.Invoke();
+            _view.gameObject.SetActive(false);
         }
 
         private void UpdateUI()
         {
+            _uiManager.UpdateCurrentShots(_model.LaserShots);
             _uiManager.UpdateSpeed(_model.CurrentSpeed);
             _uiManager.UpdateCoordinates(_model.Position, _model.Rotation);
         }

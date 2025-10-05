@@ -7,10 +7,10 @@ namespace Asteroids
 
         private readonly AsteroidPool _pool;
         private readonly DiContainer _container;
-        private readonly UIManager _uiManager;
+        private readonly GameHUDManager _uiManager;
 
         [Inject]
-        public AsteroidFactory(AsteroidPool pool, DiContainer container, UIManager manager)
+        public AsteroidFactory(AsteroidPool pool, DiContainer container, GameHUDManager manager)
         {
             _pool = pool;
             _container = container;
@@ -25,6 +25,7 @@ namespace Asteroids
             _uiManager.SubscribeOnDeath(presenter);
             presenter.OnDeath += () =>
             {
+                _uiManager.UnsubscribeOnDeath(presenter);
                 presenter.Dispose();
                 _pool.Despawn(asteroidView);
             };

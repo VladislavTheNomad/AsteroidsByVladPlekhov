@@ -5,7 +5,7 @@ namespace Asteroids
 {
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField] private UIManager _uiManager;
+        [SerializeField] private GameHUDManager _uiManager;
         [SerializeField] private GameProcessStarter _gameProcessStarter;
         [SerializeField] private Camera _camera;
 
@@ -42,7 +42,7 @@ namespace Asteroids
             Container.Bind<BulletFactory>().AsSingle();
             Container.Bind<UfoFactory>().AsSingle();
 
-            Container.BindInterfacesAndSelfTo<UIManager>().FromInstance(_uiManager).AsSingle();
+            Container.BindInterfacesAndSelfTo<GameHUDManager>().FromInstance(_uiManager).AsSingle();
             Container.BindInterfacesAndSelfTo<GameProcessStarter>().FromInstance(_gameProcessStarter).AsSingle();
 
             Container.Bind<PlayerModel>().AsSingle().WithArguments(_playerConfig).NonLazy();

@@ -15,6 +15,7 @@ namespace Asteroids
         private bool _initialized;
 
         public int AsteroidCurrentSizeLevel { private set; get; }
+        public bool IsPaused { private set; get; }
 
         [Inject]
         public void Construct(AsteroidModel model)
@@ -31,6 +32,7 @@ namespace Asteroids
             _view.OnEnabled += Starter;
             _view.OnGetSmaller += GetSmaller;
             _view.Initialize();
+
             _initialized = true;
             Starter();
         }

@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -6,14 +7,15 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class UIManager : MonoBehaviour, IInitializable
+    public class GameHUDManager : MonoBehaviour, IInitializable
     {
         private const int INITIAL_SCORE = 0;
-        private const float TIME_SCALE_PAUSED = 0f;
         private const int DECIMAL_PLACES_RECHARGE_TIMER = 2;
         private const int DECIMAL_PLACES_COORDINATES = 2;
         private const int DECIMAL_PLACES_ANGLE = 1;
         private const int DECIMAL_PLACES_SPEED = 1;
+
+        public event Action OnGamePaused;
 
         [SerializeField] private GameObject _gameOverMenu;
         [SerializeField] private TextMeshProUGUI _coordinatesText;
@@ -26,15 +28,13 @@ namespace Asteroids
         [SerializeField] private Button _quitButton;
 
         private int _score = INITIAL_SCORE;
+        private int _maxShots;
         private PlayerPresenter _playerPresenter;
-        private PlayerModel _playerModel;
 
         [Inject]
-        public void Constructor(PlayerPresenter pp, PlayerModel pm)
+        public void Constructor(PlayerPresenter pp)
         {
             _playerPresenter = pp;
-            _playerModel = pm;
-
         }
 
         private void OnDisable()
@@ -43,7 +43,6 @@ namespace Asteroids
             _quitButton.onClick.RemoveListener(QuitButtonClick);
 
             _playerPresenter.OnPlayerIsDead -= PlayerIsDead;
-            _playerModel.OnAmountLaserShotChange -= UpdateCurrentShot;
             _playerPresenter.OnRechargeTimer -= UpdateRechargeTimer;
         }
 
@@ -51,9 +50,6 @@ namespace Asteroids
         {
             _playerPresenter.OnPlayerIsDead += PlayerIsDead;
             _playerPresenter.OnRechargeTimer += UpdateRechargeTimer;
-            _playerModel.OnAmountLaserShotChange += UpdateCurrentShot;
-
-            UpdateCurrentShot();
 
             _retryButton.onClick.AddListener(RetryButtonClick);
             _quitButton.onClick.AddListener(QuitButtonClick);
@@ -67,6 +63,11 @@ namespace Asteroids
         public void UnsubscribeOnDeath(IGetPointsOnDestroy enemy)
         {
             enemy.OnDeathTakeScore -= UpdateScore;
+        }
+
+        public void SetMaxLaserShots(int maxShots)
+        {
+            _maxShots = maxShots;
         }
 
         public void UpdateCoordinates(Vector2 playerCoordinates, float angleRotation)
@@ -86,10 +87,15 @@ namespace Asteroids
             _scoreText.text = $"{_score}";
         }
 
+        public void UpdateCurrentShots(int currentShots)
+        {
+            _laserShotsText.text = $"{currentShots} / {_maxShots}";
+        }
+
         private void PlayerIsDead()
         {
             _gameOverMenu.SetActive(true);
-            Time.timeScale = TIME_SCALE_PAUSED;
+            OnGamePaused?.Invoke();
         }
 
         private void UpdateRechargeTimer(float time)
@@ -97,14 +103,8 @@ namespace Asteroids
             _rechargeTimerText.text = $"{System.Math.Round(time, DECIMAL_PLACES_RECHARGE_TIMER)}";
         }
 
-        private void UpdateCurrentShot()
-        {
-            _laserShotsText.text = $"{_playerModel.LaserShots} / {_playerModel.GetMaxLaserShots()}";
-        }
-
         private void RetryButtonClick()
         {
-            Time.timeScale = 1.0f;
             SceneManager.LoadScene("MainScene");
         }
 
