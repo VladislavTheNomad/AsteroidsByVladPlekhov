@@ -9,7 +9,6 @@ namespace Asteroids
 {
     public class GameProcessStarter : MonoBehaviour, IInitializable, IDisposable
     {
-        [SerializeField, Range(1, 10)] private int _levelsOfAsteroidSplitting;
         [SerializeField] private float _timeBetweenAsteroidsSpawns;
         [SerializeField] private float _timeBetweenUFOSpawns;
 

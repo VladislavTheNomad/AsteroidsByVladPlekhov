@@ -105,7 +105,8 @@ namespace Asteroids
 
         private void RetryButtonClick()
         {
-            SceneManager.LoadScene("MainScene");
+            Scene currentScene = SceneManager.GetActiveScene();
+            SceneManager.LoadScene(currentScene.name);
         }
 
         private void QuitButtonClick()

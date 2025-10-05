@@ -1,3 +1,4 @@
+using System;
 using Zenject;
 
 namespace Asteroids
@@ -22,14 +23,18 @@ namespace Asteroids
             UfoPresenter presenter = _container.Instantiate<UfoPresenter>();
             presenter.Initialize(view);
             _uiManager.SubscribeOnDeath(presenter);
-            presenter.OnDeath += () =>
-            {
-                _uiManager.UnsubscribeOnDeath(presenter);
-                presenter.Dispose();
-                _pool.Despawn(view);
-            };
+            Action OnDeathHandler = () => HandlerUfoDeath(presenter, view);
+            presenter.OnDeath += OnDeathHandler;
 
             return view;
+        }
+
+        private void HandlerUfoDeath(UfoPresenter presenter, UfoView view)
+        {
+            _uiManager.UnsubscribeOnDeath(presenter);
+            presenter.OnDeath -= () => HandlerUfoDeath(presenter, view);
+            presenter.Dispose();
+            _pool.Despawn(view);
         }
     }
 }

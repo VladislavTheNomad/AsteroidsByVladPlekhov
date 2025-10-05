@@ -20,6 +20,7 @@ namespace Asteroids
 
         private LineRenderer _lineRenderer;
         private PlayerControls _playerControls;
+        private WaitForSeconds _laserVisualLifespan = new WaitForSeconds(LASER_DURATION);
 
         [field: SerializeField] public GameObject LeftBound { get; private set; }
         [field: SerializeField] public GameObject RightBound { get; private set; }
@@ -121,7 +122,7 @@ namespace Asteroids
             _lineRenderer.SetPosition(0, start);
             _lineRenderer.SetPosition(1, end);
 
-            yield return new WaitForSeconds(LASER_DURATION);
+            yield return _laserVisualLifespan;
 
             _lineRenderer.enabled = false;
         }

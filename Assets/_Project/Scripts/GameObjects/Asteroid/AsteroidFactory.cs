@@ -1,3 +1,4 @@
+using System;
 using Zenject;
 
 namespace Asteroids
@@ -19,19 +20,22 @@ namespace Asteroids
 
         public AsteroidView GetAsteroidFromPool()
         {
-            AsteroidView asteroidView = _pool.Spawn();
+            AsteroidView view = _pool.Spawn();
             AsteroidPresenter presenter = _container.Instantiate<AsteroidPresenter>();
-            presenter.Initialize(asteroidView);
+            presenter.Initialize(view);
             _uiManager.SubscribeOnDeath(presenter);
-            presenter.OnDeath += () =>
-            {
-                _uiManager.UnsubscribeOnDeath(presenter);
-                presenter.Dispose();
-                _pool.Despawn(asteroidView);
-            };
+            Action OnDeathHandler = () => HandleAsteroidDeath(presenter, view);
+            presenter.OnDeath += OnDeathHandler;
 
-            return asteroidView;
+            return view;
         }
 
+        private void HandleAsteroidDeath(AsteroidPresenter presenter, AsteroidView view)
+        {
+            _uiManager.UnsubscribeOnDeath(presenter);
+            presenter.OnDeath -= () => HandleAsteroidDeath(presenter, view);
+            presenter.Dispose();
+            _pool.Despawn(view);
+        }
     }
 }

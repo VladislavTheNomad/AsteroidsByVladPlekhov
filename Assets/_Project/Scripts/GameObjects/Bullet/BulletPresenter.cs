@@ -34,6 +34,7 @@ namespace Asteroids
             _view.OnEnabled += Starter;
             _view.Initialize();
             _isAlive = true;
+
             Starter();
         }
 
@@ -41,7 +42,7 @@ namespace Asteroids
         {
             _view.MoveBullet(_model.MoveSpeed);
             await Task.Delay((int)(1000 * _model.BulletsLifeTime));
-            if(_view != null && _isAlive)
+            if (_view != null && _isAlive)
             {
                 HandleDeath();
             }

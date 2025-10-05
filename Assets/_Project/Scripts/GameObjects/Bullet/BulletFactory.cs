@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using Zenject;
 
@@ -21,13 +22,17 @@ namespace Asteroids
             view.transform.SetPositionAndRotation(playerTransform.position, playerTransform.rotation);
             BulletPresenter presenter = _container.Instantiate<BulletPresenter>();
             presenter.Initialize(view);
-            presenter.OnDeath += () =>
-            {
-                presenter.Dispose();
-                _pool.Despawn(view);
-            };
+            Action OnDeathHandler = () => HandleBulletDeath(presenter, view);
+            presenter.OnDeath += OnDeathHandler;
             view.gameObject.SetActive(true);
             return view;
+        }
+
+        private void HandleBulletDeath(BulletPresenter presenter, BulletView view)
+        {
+            presenter.OnDeath -= () => HandleBulletDeath(presenter, view);
+            presenter.Dispose();
+            _pool.Despawn(view);
         }
     }
 }

@@ -28,6 +28,7 @@ namespace Asteroids
             _view.OnEnabled += Starter;
             _view.Initialize();
             _initialized = true;
+
             ApplyBehaviour();
         }
 
