@@ -5,16 +5,16 @@ namespace Asteroids
 {
     public class UfoFactory
     {
-        private readonly UfoPool _pool;
+        private readonly MonoMemoryPool<UfoView> _pool;
         private readonly DiContainer _container;
-        private readonly GameHUDManager _uiManager;
+        private readonly ScoreCounter _scoreCounter;
 
         [Inject]
-        public UfoFactory(UfoPool pool, DiContainer container, GameHUDManager manager)
+        public UfoFactory(MonoMemoryPool<UfoView> pool, DiContainer container, ScoreCounter scoreCounter)
         {
             _pool = pool;
             _container = container;
-            _uiManager = manager;
+            _scoreCounter = scoreCounter;
         }
 
         public UfoView GetUfoFromPool()
@@ -22,7 +22,7 @@ namespace Asteroids
             UfoView view = _pool.Spawn();
             UfoPresenter presenter = _container.Instantiate<UfoPresenter>();
             presenter.Initialize(view);
-            _uiManager.SubscribeOnDeath(presenter);
+            _scoreCounter.SubscribeOnDeath(presenter);
             Action OnDeathHandler = () => HandlerUfoDeath(presenter, view);
             presenter.OnDeath += OnDeathHandler;
 
@@ -31,7 +31,7 @@ namespace Asteroids
 
         private void HandlerUfoDeath(UfoPresenter presenter, UfoView view)
         {
-            _uiManager.UnsubscribeOnDeath(presenter);
+            _scoreCounter.UnsubscribeOnDeath(presenter);
             presenter.OnDeath -= () => HandlerUfoDeath(presenter, view);
             presenter.Dispose();
             _pool.Despawn(view);

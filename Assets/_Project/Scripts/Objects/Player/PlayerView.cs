@@ -17,6 +17,7 @@ namespace Asteroids
         public event Action FireBulletRequested;
         public event Action FireLaserRequested;
         public event Action CollisionDetected;
+        public event Action OnPauseClick;
 
         private LineRenderer _lineRenderer;
         private PlayerControls _playerControls;
@@ -30,6 +31,9 @@ namespace Asteroids
         public Transform ViewTransform { get; private set; }
 
         private float _shootBulletInput;
+        private bool isPaused = false;
+        private Vector2 savedVelocity;
+        private float savedAngularVelocity;
 
         private void OnDisable()
         {
@@ -46,6 +50,8 @@ namespace Asteroids
 
         public void Update()
         {
+            if (isPaused) return;
+
             if (_shootBulletInput > 0f)
             {
                 FireBulletRequested?.Invoke();
@@ -54,6 +60,8 @@ namespace Asteroids
 
         private void FixedUpdate()
         {
+            if (isPaused) return;
+
             RotateRequested?.Invoke(_rotateInput);
 
             if (_moveInput > 0f)
@@ -79,6 +87,8 @@ namespace Asteroids
             _playerControls.Player.ShootBullet.canceled += context => _shootBulletInput = 0f;
 
             _playerControls.Player.ShootLaser.started += context => ShootLaser();
+
+            _playerControls.Player.Pause.started += context => OnPauseClick?.Invoke();
         }
 
         public void Teleport(Vector3 newPosition)
@@ -94,6 +104,24 @@ namespace Asteroids
         public void Move(float speed, ForceMode2D forceType)
         {
             Rb.AddForce(speed * transform.up, forceType);
+        }
+
+        public void TogglePause(bool switcher)
+        {
+            isPaused = switcher;
+
+            if (isPaused)
+            {
+                savedVelocity = Rb.linearVelocity;
+                savedAngularVelocity = Rb.angularVelocity;
+                Rb.linearVelocity = Vector2.zero;
+                Rb.angularVelocity = 0f;
+            }
+            else
+            {
+                Rb.linearVelocity = savedVelocity;
+                Rb.angularVelocity = savedAngularVelocity;
+            }
         }
 
         public void ShowLaserVisual()
@@ -152,6 +180,8 @@ namespace Asteroids
             _playerControls.Player.ShootBullet.canceled -= context => _shootBulletInput = 0f;
 
             _playerControls.Player.ShootLaser.started -= context => ShootLaser();
+
+            _playerControls.Player.Pause.started -= context => OnPauseClick?.Invoke();
         }
     }
 }

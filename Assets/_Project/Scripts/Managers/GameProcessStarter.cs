@@ -17,16 +17,16 @@ namespace Asteroids
         private UtilsCalculatePositions _utilsMakeRandomStartPosition;
         private AsteroidFactory _asteroidFactory;
         private UfoFactory _ufoFactory;
-        private GameHUDManager _gameHUDManager;
+        private SceneService _sceneService;
         private bool _isPaused;
 
         [Inject]
-        public void Construct(UtilsCalculatePositions utils, AsteroidFactory asteroidFactory, UfoFactory ufoFactory, GameHUDManager gameHUD)
+        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, SceneService ss)
         {
             _utilsMakeRandomStartPosition = utils;
-            _asteroidFactory = asteroidFactory;
-            _ufoFactory = ufoFactory;
-            _gameHUDManager = gameHUD;
+            _asteroidFactory = af;
+            _ufoFactory = uf;
+            _sceneService = ss;
         }
 
         public void Initialize()
@@ -34,7 +34,8 @@ namespace Asteroids
             _asteroidSpawnDelay = new WaitForSeconds(_timeBetweenAsteroidsSpawns);
             _ufoSpawnDelay = new WaitForSeconds(_timeBetweenUFOSpawns);
 
-            _gameHUDManager.OnGamePaused += StopGame;
+            _sceneService.GameIsPaused += () => _isPaused = true;
+            _sceneService.GameIsUnpaused += () => _isPaused = false;
 
             StartCoroutine(AsteroidsSpawn());
             StartCoroutine(UFOSpawn());
@@ -42,34 +43,40 @@ namespace Asteroids
 
         public void Dispose()
         {
-            _gameHUDManager.OnGamePaused -= StopGame;
-        }
-
-        private void StopGame()
-        {
-            _isPaused = true;
+            StopAllCoroutines();
+            _sceneService.GameIsPaused -= () => _isPaused = true;
+            _sceneService.GameIsUnpaused -= () => _isPaused = false;
         }
 
         private IEnumerator UFOSpawn()
         {
             yield return null;
-            while (true && !_isPaused)
+            while (true)
             {
-                    yield return _ufoSpawnDelay;
+                yield return _ufoSpawnDelay;
+
+                if(!_isPaused)
+                {
                     UfoView newUFO = _ufoFactory.GetUfoFromPool();
                     Vector2 spawnPosition = _utilsMakeRandomStartPosition.GetRandomSpawnPosition();
                     newUFO.gameObject.transform.position = spawnPosition;
+                }
             }
         }
 
         private IEnumerator AsteroidsSpawn()
         {
             yield return null;
-            while (true && !_isPaused)
+            while (true)
             {
+                yield return _asteroidSpawnDelay;
+                
+                if(!_isPaused)
+                {
                     AsteroidView newAsteroid = _asteroidFactory.GetAsteroidFromPool();
                     newAsteroid.SetNewAsteroid();
                     yield return _asteroidSpawnDelay;
+                }
             }
         }
     }

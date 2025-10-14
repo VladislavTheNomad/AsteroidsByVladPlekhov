@@ -10,15 +10,16 @@ namespace Asteroids
         public event Action<int> OnDeathTakeScore;
         public event Action OnDeath;
 
-
+        private SceneService _sceneService;
         private UfoView _view;
         private UfoModel _model;
         private bool _initialized;
 
         [Inject]
-        public void Construct(UfoModel model)
+        public void Construct(UfoModel model, SceneService sceneService)
         {
             _model = model;
+            _sceneService = sceneService;
         }
 
         public void Initialize(UfoView view)
@@ -26,6 +27,8 @@ namespace Asteroids
             _view = view;
             _view.OnDeath += HandleDeath;
             _view.OnEnabled += Starter;
+            _sceneService.GameIsPaused += PauseUfo;
+            _sceneService.GameIsUnpaused += UnpauseUfo;
             _view.Initialize();
             _initialized = true;
 
@@ -61,6 +64,8 @@ namespace Asteroids
             {
                 _view.OnDeath -= HandleDeath;
                 _view.OnEnabled -= Starter;
+                _sceneService.GameIsPaused -= PauseUfo;
+                _sceneService.GameIsUnpaused -= UnpauseUfo;
             }
         }
 
@@ -70,6 +75,16 @@ namespace Asteroids
             {
                 ApplyBehaviour();
             }
+        }
+
+        private void UnpauseUfo()
+        {
+            _view.TogglePause(false);
+        }
+
+        private void PauseUfo()
+        {
+            _view.TogglePause(true);
         }
     }
 }

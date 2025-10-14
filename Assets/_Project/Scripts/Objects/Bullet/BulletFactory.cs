@@ -19,12 +19,12 @@ namespace Asteroids
         public BulletView GetBulletFromPool(Transform playerTransform)
         {
             BulletView view = _pool.Spawn();
+            view.gameObject.SetActive(true);
             view.transform.SetPositionAndRotation(playerTransform.position, playerTransform.rotation);
             BulletPresenter presenter = _container.Instantiate<BulletPresenter>();
             presenter.Initialize(view);
             Action OnDeathHandler = () => HandleBulletDeath(presenter, view);
             presenter.OnDeath += OnDeathHandler;
-            view.gameObject.SetActive(true);
             return view;
         }
 

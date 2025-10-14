@@ -6,16 +6,16 @@ namespace Asteroids
     public class AsteroidFactory
     {
 
-        private readonly AsteroidPool _pool;
+        private readonly MonoMemoryPool<AsteroidView> _pool;
         private readonly DiContainer _container;
-        private readonly GameHUDManager _uiManager;
+        private readonly ScoreCounter _scoreCounter;
 
         [Inject]
-        public AsteroidFactory(AsteroidPool pool, DiContainer container, GameHUDManager manager)
+        public AsteroidFactory(MonoMemoryPool<AsteroidView> pool, DiContainer container, ScoreCounter scoreCounter)
         {
             _pool = pool;
             _container = container;
-            _uiManager = manager;
+            _scoreCounter = scoreCounter;
         }
 
         public AsteroidView GetAsteroidFromPool()
@@ -23,7 +23,7 @@ namespace Asteroids
             AsteroidView view = _pool.Spawn();
             AsteroidPresenter presenter = _container.Instantiate<AsteroidPresenter>();
             presenter.Initialize(view);
-            _uiManager.SubscribeOnDeath(presenter);
+            _scoreCounter.SubscribeOnDeath(presenter);
             Action OnDeathHandler = () => HandleAsteroidDeath(presenter, view);
             presenter.OnDeath += OnDeathHandler;
 
@@ -32,7 +32,7 @@ namespace Asteroids
 
         private void HandleAsteroidDeath(AsteroidPresenter presenter, AsteroidView view)
         {
-            _uiManager.UnsubscribeOnDeath(presenter);
+            _scoreCounter.UnsubscribeOnDeath(presenter);
             presenter.OnDeath -= () => HandleAsteroidDeath(presenter, view);
             presenter.Dispose();
             _pool.Despawn(view);

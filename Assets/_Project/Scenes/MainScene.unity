@@ -731,6 +731,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee8f8ecb9d4049c4cae8753042dff41d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <MaxLaserShots>k__BackingField: 3
+  <LaserDistance>k__BackingField: 20
   <RotationSpeed>k__BackingField: 50
   <MovementSpeed>k__BackingField: 10
   <BulletRechargeTime>k__BackingField: 0.5
@@ -1251,9 +1253,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4d9267786042aa429abe895d6d2e63b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _levelsOfAsteroidSplitting: 3
-  _timeBetweenAsteroidsSpawns: 5
-  _timeBetweenUFOSpawns: 3
+  _timeBetweenAsteroidsSpawns: 3
+  _timeBetweenUFOSpawns: 5
 --- !u!1 &757719837
 GameObject:
   m_ObjectHideFlags: 0
@@ -1467,7 +1468,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d45ba36ef41f9934a80d40888538ff0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _uiManager: {fileID: 1819972967}
+  _HUDView: {fileID: 0}
   _gameProcessStarter: {fileID: 734819092}
   _camera: {fileID: 1396529298}
   _playerView: {fileID: 643207602}
@@ -3107,7 +3108,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 1819972965}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1bdba64b1c21f3949bf37f681fd56121, type: 3}
+  m_Script: {fileID: 11500000, guid: 9b1c9a39552e25b4cacdc9bbcc1c074f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _gameOverMenu: {fileID: 228845594}

@@ -5,7 +5,7 @@ namespace Asteroids
 {
     public class GameInstaller : MonoInstaller
     {
-        [SerializeField] private GameHUDManager _uiManager;
+        [SerializeField] private HUDView _HUDView;
         [SerializeField] private GameProcessStarter _gameProcessStarter;
         [SerializeField] private Camera _camera;
 
@@ -23,7 +23,7 @@ namespace Asteroids
 
         public override void InstallBindings()
         {
-            Container.BindMemoryPool<AsteroidView, AsteroidPool>().
+            Container.BindMemoryPool<AsteroidView, MonoMemoryPool<AsteroidView>>().
                 WithInitialSize(_poolSize).
                 FromComponentInNewPrefab(_asteroidPrefab).
                 UnderTransformGroup("Asteroids");
@@ -33,7 +33,7 @@ namespace Asteroids
                 FromComponentInNewPrefab(_bulletPrefab).
                 UnderTransformGroup("Bullets");
 
-            Container.BindMemoryPool<UfoView, UfoPool>().
+            Container.BindMemoryPool<UfoView, MonoMemoryPool<UfoView>>().
                 WithInitialSize(_poolSize).
                 FromComponentInNewPrefab(_ufoPrefab).
                 UnderTransformGroup("UFO's");
@@ -42,7 +42,7 @@ namespace Asteroids
             Container.Bind<BulletFactory>().AsSingle();
             Container.Bind<UfoFactory>().AsSingle();
 
-            Container.BindInterfacesAndSelfTo<GameHUDManager>().FromInstance(_uiManager).AsSingle();
+            Container.BindInterfacesAndSelfTo<HUDView>().FromInstance(_HUDView).AsSingle();
             Container.BindInterfacesAndSelfTo<GameProcessStarter>().FromInstance(_gameProcessStarter).AsSingle();
 
             Container.Bind<PlayerModel>().AsSingle().WithArguments(_playerConfig).NonLazy();
@@ -57,6 +57,10 @@ namespace Asteroids
             Container.BindInterfacesAndSelfTo<BulletPresenter>().AsTransient();
             Container.BindInterfacesAndSelfTo<PlayerPresenter>().AsSingle().NonLazy();
 
+            Container.Bind<HUDModel>().AsSingle().NonLazy();
+            Container.Bind<HUDPresenter>().AsSingle().NonLazy();
+            Container.Bind<SceneService>().AsSingle().NonLazy();
+            Container.Bind<ScoreCounter>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
             Container.Bind<Camera>().FromInstance(_camera).AsSingle().NonLazy();
         }

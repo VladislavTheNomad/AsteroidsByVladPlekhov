@@ -13,6 +13,9 @@ namespace Asteroids
         public Transform ViewTransform { get; private set; }
 
         private Rigidbody2D _rb;
+        private bool _isPaused;
+        private Vector2 savedLinearVelocity;
+        private float savedAngularVelocity;
 
         private void OnEnable()
         {
@@ -33,6 +36,8 @@ namespace Asteroids
 
         public void Move(Vector3 destination, float moveSpeed)
         {
+            if (_isPaused) return;
+
             _rb.linearVelocity = Vector2.zero;
             _rb.angularVelocity = 0f;
             _rb.AddForce(destination * moveSpeed, ForceMode2D.Impulse);
@@ -41,6 +46,24 @@ namespace Asteroids
         public void HandleDeath()
         {
             OnDeath?.Invoke();
+        }
+
+        public void TogglePause(bool switcher)
+        {
+            _isPaused = switcher;
+
+            if (_isPaused)
+            {
+                savedLinearVelocity = _rb.linearVelocity;
+                savedAngularVelocity = _rb.angularVelocity;
+                _rb.linearVelocity = Vector2.zero;
+                _rb.angularVelocity = 0f;
+            }
+            else if(!_isPaused)
+            {
+                _rb.linearVelocity = savedLinearVelocity;
+                _rb.angularVelocity = savedAngularVelocity;
+            }
         }
     }
 }
