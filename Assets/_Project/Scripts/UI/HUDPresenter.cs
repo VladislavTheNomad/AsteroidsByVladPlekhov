@@ -19,10 +19,10 @@ namespace Asteroids
             _scoreCounter = sc;
             _model = model;
             _view = view;
-            Initialize();
+            RegisterDependencies();
         }
 
-        public void Initialize()
+        public void RegisterDependencies()
         {
             _model.OnCoordinatesUpdated += _view.UpdateCoordinates;
             _model.OnSpeedUpdated += _view.UpdateSpeed;
