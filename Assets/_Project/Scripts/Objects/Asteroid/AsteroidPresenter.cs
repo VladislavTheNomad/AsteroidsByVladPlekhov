@@ -11,7 +11,6 @@ namespace Asteroids
 
         private AsteroidView _view;
         private AsteroidModel _model;
-        private SceneService _sceneService;
         private float _acceleration = 1f;
         private bool _initialized;
 
@@ -19,16 +18,14 @@ namespace Asteroids
         public bool IsPaused { private set; get; }
 
         [Inject]
-        public void Construct(AsteroidModel model, SceneService ss)
+        public void Construct(AsteroidModel model)
         {
             _model = model;
-            _sceneService = ss;
         }
 
         public void Initialize(AsteroidView newView)
         {
-            _sceneService.GameIsPaused += PauseAsteroid;
-            _sceneService.GameIsUnpaused += UnpauseAsteroid;
+            _model.IsGamePaused += PauseAsteroid;
 
             _view = newView;
             _view.OnDeath += DestroyAsteroid;
@@ -95,13 +92,12 @@ namespace Asteroids
         {
             if (_view != null)
             {
+                _model.IsGamePaused -= PauseAsteroid;
                 _view.OnDeath -= DestroyAsteroid;
                 _view.OnMovement -= CheckBounds;
                 _view.OnSetNew -= SetStartConditions;
                 _view.OnEnabled -= Starter;
                 _view.OnGetSmaller -= GetSmaller;
-
-
             }
         }
 
@@ -119,14 +115,9 @@ namespace Asteroids
             _view.Move(destinationPoint, startImpulse, _acceleration);
         }
 
-        private void UnpauseAsteroid()
+        private void PauseAsteroid(bool condition)
         {
-            _view.TogglePause(false);
-        }
-
-        private void PauseAsteroid()
-        {
-            _view.TogglePause(true);
+            _view.TogglePause(condition);
         }
     }
 }

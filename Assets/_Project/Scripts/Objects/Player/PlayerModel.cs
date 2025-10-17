@@ -1,10 +1,15 @@
+using System;
+using System.Linq;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerModel
+    public class PlayerModel : ITickable, IDisposable
     {
         private const int SIZE_OF_RAYCASTHITS_ARRAY = 10;
+
+        public event Action<bool> IsGamePaused;
 
         public Vector3 Position { get; private set; }
         public float Rotation { get; private set; }
@@ -20,25 +25,27 @@ namespace Asteroids
         public LayerMask DestructableLayers { get; private set; }
 
         private BulletFactory _bulletFactory;
+        private HUDModel _HUDModel;
+        private PauseManager _pauseManager;
         private UtilsCalculatePositions _utils;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 
         private bool _isBulletRecharging;
         private float _rechargeBulletTimer = 0f;
 
-        public PlayerModel(PlayerConfig playerConfig, Camera camera, BulletFactory bulletFactory, UtilsCalculatePositions utils)
+        public PlayerModel(PlayerConfig pc, BulletFactory bf, UtilsCalculatePositions utils, HUDModel hudModel, PauseManager pm)
         {
             Position = Vector3.zero;
             Rotation = 0f;
             CurrentSpeed = 0f;
 
-            MovementSpeed = playerConfig.MovementSpeed;
-            RotationSpeed = playerConfig.RotationSpeed;
-            BulletRechargeTime = playerConfig.BulletRechargeTime;
-            LaserRechargeTime = playerConfig.LaserRechargeTime;
-            DestructableLayers = playerConfig.DestructableLayers;
-            MaxLaserShots = playerConfig.MaxLaserShots;
-            LaserDistance = playerConfig.LaserDistance;
+            MovementSpeed = pc.MovementSpeed;
+            RotationSpeed = pc.RotationSpeed;
+            BulletRechargeTime = pc.BulletRechargeTime;
+            LaserRechargeTime = pc.LaserRechargeTime;
+            DestructableLayers = pc.DestructableLayers;
+            MaxLaserShots = pc.MaxLaserShots;
+            LaserDistance = pc.LaserDistance;
 
             CurrentLaserShots = MaxLaserShots;
             LaserRechargeTimers = new float[MaxLaserShots];
@@ -48,8 +55,26 @@ namespace Asteroids
                 LaserRechargeTimers[i] = 0f;
             }
 
-            _bulletFactory = bulletFactory;
+            _bulletFactory = bf;
             _utils = utils;
+            _HUDModel = hudModel;
+            _pauseManager = pm;
+
+            _pauseManager.GameIsPaused += TogglePause;
+
+            _HUDModel.SetMaxLaserShots(GetMaxLaserShots());
+        }
+
+        public void Dispose()
+        {
+            _pauseManager.GameIsPaused -= TogglePause;
+        }
+
+        public void Tick()
+        {
+            CheckBulletRecharge(Time.deltaTime);
+            CheckLaserRecharge(Time.deltaTime);
+            UpdateUI();
         }
 
         public void CheckBulletRecharge(float deltaTime)
@@ -129,6 +154,11 @@ namespace Asteroids
             canFire = false;
         }
 
+        public void RequestDeathConditions()
+        {
+            _HUDModel.PlayerDead();
+        }
+
         public void RayCastGo(GameObject bound, Transform transform)
         {
             int hits = Physics2D.RaycastNonAlloc(bound.transform.position, transform.up, _raycastHits, LaserDistance, DestructableLayers);
@@ -147,10 +177,25 @@ namespace Asteroids
             CurrentSpeed = newSpeed;
         }
 
+        public void PauseGame() => _pauseManager.PauseGame();
+
         public int GetMaxLaserShots() => MaxLaserShots;
 
         public void SetPosition(Vector3 pos) => Position = pos;
         public void SetRotation(float rotation) => Rotation = rotation;
+
+        private void TogglePause(bool condition)
+        {
+            switch (condition)
+            {
+                case true:
+                    IsGamePaused?.Invoke(true);
+                    break;
+                case false:
+                    IsGamePaused?.Invoke(false);
+                    break;
+            }
+        }
 
         private void IncreaseLaserShots()
         {
@@ -166,6 +211,14 @@ namespace Asteroids
             {
                 CurrentLaserShots--;
             }
+        }
+
+        private void UpdateUI()
+        {
+            _HUDModel.UpdateRechargeTimer(LaserRechargeTimers.Min());
+            _HUDModel.UpdateCurrentShots(CurrentLaserShots);
+            _HUDModel.UpdateSpeed(CurrentSpeed);
+            _HUDModel.UpdateCoordinates(Position, Rotation);
         }
     }
 }

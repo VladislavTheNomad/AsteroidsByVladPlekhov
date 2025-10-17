@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace Asteroids
 {
-    public class AsteroidConfig : MonoBehaviour
+    [CreateAssetMenu(fileName = "AsteroidConfig", menuName = "Configs/AsteroidConfig")]
+    public class AsteroidConfig : ScriptableObject
     {
         [field: SerializeField, Range(10, 100)] public float MaxMoveSpeed { get; private set; }
         [field: SerializeField, Range(10, 100)] public float MinMoveSpeed { get; private set; }

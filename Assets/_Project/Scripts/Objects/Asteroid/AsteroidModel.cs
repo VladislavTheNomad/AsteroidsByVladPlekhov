@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace Asteroids
@@ -5,6 +6,8 @@ namespace Asteroids
     public class AsteroidModel
     {
         private const float SCALE_REDUCE = 0.5f;
+
+        public event Action<bool> IsGamePaused;
 
         public float MaxMoveSpeed { get; private set; }
         public float MinMoveSpeed { get; private set; }
@@ -16,10 +19,11 @@ namespace Asteroids
         private Camera _mainCamera;
         private UtilsCalculatePositions _utils;
         private AsteroidFactory _factory;
+        private PauseManager _pauseManager;
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
 
-        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utilsCalculatePositions, AsteroidFactory factory)
+        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseManager pm)
         {
             MaxMoveSpeed = asteroidConfig.MaxMoveSpeed;
             MinMoveSpeed = asteroidConfig.MinMoveSpeed;
@@ -29,11 +33,14 @@ namespace Asteroids
             ScorePoints = asteroidConfig.ScorePoints;
 
             _mainCamera = camera;
-            _utils = utilsCalculatePositions;
+            _utils = utils;
             _factory = factory;
+            _pauseManager = pm;
 
             _bottomLeft = _mainCamera.ViewportToWorldPoint(Vector2.zero);
             _topRight = _mainCamera.ViewportToWorldPoint(Vector2.one);
+
+            _pauseManager.GameIsPaused += TogglePause;
         }
 
         public Vector3 CheckBounds(Transform transform)
@@ -67,14 +74,27 @@ namespace Asteroids
 
         public void SetMovingDestination(Transform transform, out float startImpulse, out Vector3 destinationPoint)
         {
-            Vector3 targetPoint = new Vector3(Random.Range(_bottomLeft.x, _topRight.x), Random.Range(_bottomLeft.y, _topRight.y), 0);
+            Vector3 targetPoint = new Vector3(UnityEngine.Random.Range(_bottomLeft.x, _topRight.x), UnityEngine.Random.Range(_bottomLeft.y, _topRight.y), 0);
             destinationPoint = (targetPoint - transform.position).normalized;
-            startImpulse = Random.Range(MinMoveSpeed, MaxMoveSpeed);
+            startImpulse = UnityEngine.Random.Range(MinMoveSpeed, MaxMoveSpeed);
         }
 
         private float AddAcceleration(float currentAcceleration)
         {
             return currentAcceleration + AccelerationModificator;
+        }
+
+        private void TogglePause(bool condition)
+        {
+            switch (condition)
+            {
+                case true:
+                    IsGamePaused?.Invoke(true);
+                    break;
+                case false:
+                    IsGamePaused?.Invoke(false);
+                    break;
+            }
         }
     }
 }

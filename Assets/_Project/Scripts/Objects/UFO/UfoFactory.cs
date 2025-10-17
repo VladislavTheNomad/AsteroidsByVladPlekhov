@@ -23,16 +23,18 @@ namespace Asteroids
             UfoPresenter presenter = _container.Instantiate<UfoPresenter>();
             presenter.Initialize(view);
             _scoreCounter.SubscribeOnDeath(presenter);
-            Action OnDeathHandler = () => HandlerUfoDeath(presenter, view);
-            presenter.OnDeath += OnDeathHandler;
+
+            Action handler = null;
+            handler = () => HandlerUfoDeath(presenter, view, handler);
+            presenter.OnDeath += handler;
 
             return view;
         }
 
-        private void HandlerUfoDeath(UfoPresenter presenter, UfoView view)
+        private void HandlerUfoDeath(UfoPresenter presenter, UfoView view, Action handler)
         {
             _scoreCounter.UnsubscribeOnDeath(presenter);
-            presenter.OnDeath -= () => HandlerUfoDeath(presenter, view);
+            presenter.OnDeath -= handler;
             presenter.Dispose();
             _pool.Despawn(view);
         }

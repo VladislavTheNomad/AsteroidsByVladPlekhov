@@ -2,7 +2,8 @@ using UnityEngine;
 
 namespace Asteroids
 {
-    public class PlayerConfig : MonoBehaviour
+    [CreateAssetMenu(fileName = "PlayerConfig", menuName = "Configs/PlayerConfig")]
+    public class PlayerConfig : ScriptableObject
     {
         [field: SerializeField, Range(0, 10)] public int MaxLaserShots { get; private set; }
         [field: SerializeField, Range(0, 100)] public float LaserDistance { get; private set; }

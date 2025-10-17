@@ -108,6 +108,8 @@ namespace Asteroids
 
         public void TogglePause(bool switcher)
         {
+            if (Rb.Equals(null)) return;
+
             isPaused = switcher;
 
             if (isPaused)

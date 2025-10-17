@@ -17,16 +17,16 @@ namespace Asteroids
         private UtilsCalculatePositions _utilsMakeRandomStartPosition;
         private AsteroidFactory _asteroidFactory;
         private UfoFactory _ufoFactory;
-        private SceneService _sceneService;
+        private PauseManager _pauseManager;
         private bool _isPaused;
 
         [Inject]
-        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, SceneService ss)
+        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseManager pm)
         {
             _utilsMakeRandomStartPosition = utils;
             _asteroidFactory = af;
             _ufoFactory = uf;
-            _sceneService = ss;
+            _pauseManager = pm;
         }
 
         public void Initialize()
@@ -34,8 +34,7 @@ namespace Asteroids
             _asteroidSpawnDelay = new WaitForSeconds(_timeBetweenAsteroidsSpawns);
             _ufoSpawnDelay = new WaitForSeconds(_timeBetweenUFOSpawns);
 
-            _sceneService.GameIsPaused += () => _isPaused = true;
-            _sceneService.GameIsUnpaused += () => _isPaused = false;
+            _pauseManager.GameIsPaused += TogglePause;
 
             StartCoroutine(AsteroidsSpawn());
             StartCoroutine(UFOSpawn());
@@ -44,8 +43,12 @@ namespace Asteroids
         public void Dispose()
         {
             StopAllCoroutines();
-            _sceneService.GameIsPaused -= () => _isPaused = true;
-            _sceneService.GameIsUnpaused -= () => _isPaused = false;
+            _pauseManager.GameIsPaused -= TogglePause;
+        }
+
+        private void TogglePause(bool condition)
+        {
+            _isPaused = condition;
         }
 
         private IEnumerator UFOSpawn()

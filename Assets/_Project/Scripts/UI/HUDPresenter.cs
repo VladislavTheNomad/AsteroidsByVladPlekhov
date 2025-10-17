@@ -5,18 +5,12 @@ namespace Asteroids
 {
     public class HUDPresenter : IDisposable
     {
-        private PlayerPresenter _playerPresenter;
-        private SceneService _sceneService;
         private HUDModel _model;
         private HUDView _view;
-        private ScoreCounter _scoreCounter;
 
         [Inject]
-        public void Construct(PlayerPresenter pp, SceneService ss, HUDModel model, HUDView view, ScoreCounter sc)
+        public void Construct(HUDModel model, HUDView view)
         {
-            _playerPresenter = pp;
-            _sceneService = ss;
-            _scoreCounter = sc;
             _model = model;
             _view = view;
             RegisterDependencies();
@@ -28,19 +22,12 @@ namespace Asteroids
             _model.OnSpeedUpdated += _view.UpdateSpeed;
             _model.OnCurrentShotsUpdated += current => _view.UpdateCurrentShots(current, _model.MaxShots);
             _model.OnRechargeTimerUpdated += _view.UpdateRechargeTimer;
-            _model.OnPlayerDead += () =>
-            {
-                _view.ShowGameOverMenu();
-                _sceneService.PauseGame();
-            };
+            _model.OnPlayerDead += _view.ShowGameOverMenu;
 
-            _playerPresenter.OnPlayerIsDead += _model.PlayerDied;
-            _playerPresenter.OnRechargeTimer += _model.UpdateRechargeTimer;
+            _model.OnScoreChanged += _view.UpdateScore;
 
-            _scoreCounter.OnScoreChanged += _view.UpdateScore;
-
-            _view.OnRetryButtonClicked += _sceneService.ReloadGame;
-            _view.OnExitButtonClicked += _sceneService.ExitGame;
+            _view.OnRetryButtonClicked += _model.RequestReloadGame;
+            _view.OnExitButtonClicked += _model.RequestExitGame;
         }
 
         public void Dispose()
@@ -49,19 +36,12 @@ namespace Asteroids
             _model.OnSpeedUpdated -= _view.UpdateSpeed;
             _model.OnCurrentShotsUpdated -= current => _view.UpdateCurrentShots(current, _model.MaxShots);
             _model.OnRechargeTimerUpdated -= _view.UpdateRechargeTimer;
-            _model.OnPlayerDead -= () =>
-            {
-                _view.ShowGameOverMenu();
-                _sceneService.PauseGame();
-            };
+            _model.OnPlayerDead -= _view.ShowGameOverMenu;
 
-            _playerPresenter.OnPlayerIsDead -= _model.PlayerDied;
-            _playerPresenter.OnRechargeTimer -= _model.UpdateRechargeTimer;
+            _model.OnScoreChanged -= _view.UpdateScore;
 
-            _scoreCounter.OnScoreChanged -= _view.UpdateScore;
-
-            _view.OnRetryButtonClicked -= _sceneService.ReloadGame;
-            _view.OnExitButtonClicked -= _sceneService.ExitGame;
+            _view.OnRetryButtonClicked += _model.RequestReloadGame;
+            _view.OnExitButtonClicked += _model.RequestExitGame;
         }
     }
 }

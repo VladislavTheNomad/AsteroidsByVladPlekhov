@@ -118,53 +118,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &86796154
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 86796156}
-  - component: {fileID: 86796155}
-  m_Layer: 0
-  m_Name: UFO
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &86796155
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 86796154}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f673cb113a3e4c74bb653926d0587631, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <ScorePoints>k__BackingField: 1
-  <MoveSpeed>k__BackingField: 2
-  <GapBetweenPositionChanging>k__BackingField: 1
---- !u!4 &86796156
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 86796154}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1325169595}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &97044106
 GameObject:
   m_ObjectHideFlags: 0
@@ -687,59 +640,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 524032903}
   m_CullTransparentMesh: 1
---- !u!1 &545801762
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 545801763}
-  - component: {fileID: 545801764}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &545801763
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545801762}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1325169595}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &545801764
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 545801762}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ee8f8ecb9d4049c4cae8753042dff41d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <MaxLaserShots>k__BackingField: 3
-  <LaserDistance>k__BackingField: 20
-  <RotationSpeed>k__BackingField: 50
-  <MovementSpeed>k__BackingField: 10
-  <BulletRechargeTime>k__BackingField: 0.5
-  <LaserRechargeTime>k__BackingField: 10
-  <DestructableLayers>k__BackingField:
-    serializedVersion: 2
-    m_Bits: 1024
 --- !u!1 &573088043
 GameObject:
   m_ObjectHideFlags: 0
@@ -926,17 +826,6 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
---- !u!114 &643207602 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 3908750840605295985, guid: 4528138b3417a3547a1de6830a9c050f, type: 3}
-  m_PrefabInstance: {fileID: 6544308946594936349}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6ffee9369dbaac342bb6794624776a8b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &712919828
 GameObject:
   m_ObjectHideFlags: 0
@@ -1453,7 +1342,7 @@ MonoBehaviour:
   OnPostResolve:
     m_PersistentCalls:
       m_Calls: []
-  _parentNewObjectsUnderSceneContext: 0
+  _parentNewObjectsUnderSceneContext: 1
   _contractNames: []
   _parentContractNames: []
 --- !u!114 &933231197
@@ -1465,17 +1354,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 933231194}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d45ba36ef41f9934a80d40888538ff0e, type: 3}
+  m_Script: {fileID: 11500000, guid: 92f23c4992c8f824d8ae625e84e22745, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _HUDView: {fileID: 0}
+  _HUDView: {fileID: 1819972967}
   _gameProcessStarter: {fileID: 734819092}
   _camera: {fileID: 1396529298}
-  _playerView: {fileID: 643207602}
-  _playerConfig: {fileID: 545801764}
-  _bulletConfig: {fileID: 1340252795}
-  _asteroidConfig: {fileID: 1830503617}
-  _ufoConfig: {fileID: 86796155}
+  _playerView: {fileID: 6544308946594936350}
+  _playerConfig: {fileID: 11400000, guid: d118ad50383f7b24ab1f1ec06fb59c6b, type: 2}
+  _bulletConfig: {fileID: 11400000, guid: 3779056d3bb869642b8a78d6bdab5962, type: 2}
+  _asteroidConfig: {fileID: 11400000, guid: f6137251cfdff214ca53137ac53a88ff, type: 2}
+  _ufoConfig: {fileID: 11400000, guid: 3f561bb051ef6a449bab81809e56fe5c, type: 2}
   _asteroidPrefab: {fileID: 4265792025796565592, guid: 0ed864b98be16a8448933a4cff2f7515, type: 3}
   _bulletPrefab: {fileID: 2741215976847407681, guid: 3956660c1f071fb459bdce6118f94cd1, type: 3}
   _ufoPrefab: {fileID: 5821226311079335962, guid: f4f4cf82b36f79741bf5e5ccd0cc9733, type: 3}
@@ -2272,87 +2161,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1290931164}
   m_CullTransparentMesh: 1
---- !u!1 &1325169594
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1325169595}
-  m_Layer: 0
-  m_Name: '[ CONFIGS ]'
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1325169595
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1325169594}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1340252794}
-  - {fileID: 545801763}
-  - {fileID: 1830503616}
-  - {fileID: 86796156}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1340252793
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1340252794}
-  - component: {fileID: 1340252795}
-  m_Layer: 0
-  m_Name: Bullet
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1340252794
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1340252793}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1325169595}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1340252795
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1340252793}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0e6d3ee73d60abd4bb13545d2a047dc7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <BulletsLifeTime>k__BackingField: 1
-  <MoveSpeed>k__BackingField: 20
 --- !u!1 &1378349633
 GameObject:
   m_ObjectHideFlags: 0
@@ -3120,56 +2928,6 @@ MonoBehaviour:
   _scoreText: {fileID: 757719839}
   _retryButton: {fileID: 1225471115}
   _quitButton: {fileID: 1865018617}
---- !u!1 &1830503615
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1830503616}
-  - component: {fileID: 1830503617}
-  m_Layer: 0
-  m_Name: Asteroids
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1830503616
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1830503615}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1325169595}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1830503617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1830503615}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e5608604f466e494f88e3d52ac62ad3d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  <MaxMoveSpeed>k__BackingField: 60
-  <MinMoveSpeed>k__BackingField: 30
-  <AccelerationModificator>k__BackingField: 1
-  <MaxSizeLevel>k__BackingField: 3
-  <SmallAsteroidQuantity>k__BackingField: 3
-  <ScorePoints>k__BackingField: 1
 --- !u!1 &1861637619
 GameObject:
   m_ObjectHideFlags: 0
@@ -3904,11 +3662,21 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4528138b3417a3547a1de6830a9c050f, type: 3}
+--- !u!114 &6544308946594936350 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3908750840605295985, guid: 4528138b3417a3547a1de6830a9c050f, type: 3}
+  m_PrefabInstance: {fileID: 6544308946594936349}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ffee9369dbaac342bb6794624776a8b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1325169595}
   - {fileID: 1726762668}
   - {fileID: 1256270303}
   - {fileID: 573088046}

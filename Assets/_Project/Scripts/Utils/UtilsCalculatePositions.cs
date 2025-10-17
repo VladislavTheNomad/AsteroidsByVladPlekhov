@@ -93,5 +93,8 @@ namespace Asteroids
             }
             return spawnRandomPlace;
         }
+
+        public Vector2 GetBottomLeftVector() => _bottomLeft;
+        public Vector2 GetTopRightVector() => _topRight;
     }
 }

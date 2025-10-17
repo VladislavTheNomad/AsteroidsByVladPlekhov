@@ -11,15 +11,15 @@ namespace Asteroids
         private BulletModel _model;
         private BulletView _view;
         private bool _isAlive = true;
-        private SceneService _sceneService;
+        private PauseManager _pauseManager;
 
         public float CurrentLifetime { get; private set; }
 
         [Inject]
-        public void Construct(BulletModel bm, SceneService ss)
+        public void Construct(BulletModel bm, PauseManager pm)
         {
             _model = bm;
-            _sceneService = ss;
+            _pauseManager = pm;
         }
 
         public void Dispose()
@@ -31,8 +31,7 @@ namespace Asteroids
                 _view.OnLifeTimeSpendingFreeze -= SetCurrentLifeTime;
                 _view.OnDeath -= HandleDeath;
 
-                _sceneService.GameIsPaused -= PauseBullet;
-                _sceneService.GameIsUnpaused -= UnpauseBullet;
+                _pauseManager.GameIsPaused -= PauseBullet;
             }
         }
 
@@ -45,8 +44,7 @@ namespace Asteroids
             _view.Initialize();
             _isAlive = true;
 
-            _sceneService.GameIsPaused += PauseBullet;
-            _sceneService.GameIsUnpaused += UnpauseBullet;
+            _pauseManager.GameIsPaused += PauseBullet;
 
             SetCurrentLifeTime(0f);
             StartLifeTime();
@@ -66,15 +64,18 @@ namespace Asteroids
             OnDeath?.Invoke();
         }
 
-        private void PauseBullet()
+        private void PauseBullet(bool condition)
         {
-            _view.TogglePause(true);
-        }
-
-        private void UnpauseBullet()
-        {
-            _view.TogglePause(false);
-            _view.StartCoroutine(_view.LifeSpan(CurrentLifetime, _model.BulletsLifeTime));
+            switch (condition)
+            {
+                case true:
+                    _view.TogglePause(true);
+                    break;
+                case false:
+                    _view.TogglePause(false);
+                    _view.StartCoroutine(_view.LifeSpan(CurrentLifetime, _model.BulletsLifeTime));
+                    break;
+            }
         }
 
         private void SetCurrentLifeTime(float currentLifeTime)

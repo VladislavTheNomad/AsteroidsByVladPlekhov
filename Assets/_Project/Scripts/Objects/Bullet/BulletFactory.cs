@@ -23,14 +23,17 @@ namespace Asteroids
             view.transform.SetPositionAndRotation(playerTransform.position, playerTransform.rotation);
             BulletPresenter presenter = _container.Instantiate<BulletPresenter>();
             presenter.Initialize(view);
-            Action OnDeathHandler = () => HandleBulletDeath(presenter, view);
-            presenter.OnDeath += OnDeathHandler;
+
+            Action handler = null;
+            handler = () => HandleBulletDeath(presenter, view, handler);
+            presenter.OnDeath += handler;
+
             return view;
         }
 
-        private void HandleBulletDeath(BulletPresenter presenter, BulletView view)
+        private void HandleBulletDeath(BulletPresenter presenter, BulletView view, Action handler)
         {
-            presenter.OnDeath -= () => HandleBulletDeath(presenter, view);
+            presenter.OnDeath -= handler;
             presenter.Dispose();
             _pool.Despawn(view);
         }
