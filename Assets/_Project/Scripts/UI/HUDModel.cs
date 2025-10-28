@@ -17,13 +17,15 @@ namespace Asteroids
         private int _currentShots;
         private SceneService _sceneService;
         private ScoreCounter _scoreCounter;
-        private PauseManager _pauseManager;
+        private PauseGame _pauseManager;
+        private SaveData _saveData;
 
         [Inject]
-        public HUDModel(SceneService ss, ScoreCounter sc, PauseManager pm)
+        public HUDModel(SceneService ss, ScoreCounter sc, PauseGame pm, SaveData sd)
         {
             _sceneService = ss;
             _scoreCounter = sc;
+            _saveData = sd;
             _pauseManager = pm;
 
             _scoreCounter.OnScoreChanged += UpdateScore;
@@ -63,8 +65,8 @@ namespace Asteroids
         public void PlayerDead()
         {
             OnPlayerDead?.Invoke();
-            _scoreCounter.SaveScore();
-            _pauseManager.PauseGame();
+            _saveData.SaveScore();
+            _pauseManager.PauseGameProcess();
         }
 
         public void RequestReloadGame()

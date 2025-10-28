@@ -16,26 +16,34 @@ namespace Asteroids
         [SerializeField] private AsteroidConfig _asteroidConfig;
         [SerializeField] private UFOConfig _ufoConfig;
 
-        [SerializeField] private GameObject _asteroidPrefab;
-        [SerializeField] private GameObject _bulletPrefab;
-        [SerializeField] private GameObject _ufoPrefab;
+        [SerializeField] private string _asteroidPrefabAddress = "Asteroid";
+        [SerializeField] private string _bulletPrefabAddress = "Bullet";
+        [SerializeField] private string _ufoPrefabAddress = "Ufo";
         [SerializeField] private int _poolSize;
 
         public override void InstallBindings()
         {
+            Container.Bind<IAssetProvider>().To<AssetProvider>().AsSingle().NonLazy();
+            
+            var assetProvider = Container.Resolve<IAssetProvider>();
+
+            var asteroidPrefab = assetProvider.LoadPrefab(_asteroidPrefabAddress);
+            var bulletPrefab = assetProvider.LoadPrefab(_bulletPrefabAddress);
+            var ufoPrefab = assetProvider.LoadPrefab(_ufoPrefabAddress);
+
             Container.BindMemoryPool<AsteroidView, MonoMemoryPool<AsteroidView>>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(_asteroidPrefab).
+                FromComponentInNewPrefab(asteroidPrefab).
                 UnderTransformGroup("Asteroids");
 
             Container.BindMemoryPool<BulletView, BulletPool>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(_bulletPrefab).
+                FromComponentInNewPrefab(bulletPrefab).
                 UnderTransformGroup("Bullets");
 
             Container.BindMemoryPool<UfoView, MonoMemoryPool<UfoView>>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(_ufoPrefab).
+                FromComponentInNewPrefab(ufoPrefab).
                 UnderTransformGroup("UFO's");
 
             Container.Bind<AsteroidFactory>().AsSingle();
@@ -43,6 +51,10 @@ namespace Asteroids
             Container.Bind<UfoFactory>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<SaveData>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<SceneService>().AsSingle().NonLazy();
+            Container.Bind<Statistics>().AsSingle().NonLazy();
+            Container.Bind<IAnalytics>().To<FirebaseAnalyticsService>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<HUDModel>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().WithArguments(_playerConfig).NonLazy();

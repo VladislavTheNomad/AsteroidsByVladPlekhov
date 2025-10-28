@@ -1,7 +1,5 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Zenject;
 
@@ -17,20 +15,24 @@ namespace Asteroids
         private UtilsCalculatePositions _utilsMakeRandomStartPosition;
         private AsteroidFactory _asteroidFactory;
         private UfoFactory _ufoFactory;
-        private PauseManager _pauseManager;
+        private PauseGame _pauseManager;
+        private IAnalytics _analytics;
         private bool _isPaused;
 
         [Inject]
-        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseManager pm)
+        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseGame pm, IAnalytics analytics)
         {
             _utilsMakeRandomStartPosition = utils;
             _asteroidFactory = af;
             _ufoFactory = uf;
             _pauseManager = pm;
+            _analytics = analytics;
         }
 
         public void Initialize()
         {
+            _analytics.LogGameStart();
+
             _asteroidSpawnDelay = new WaitForSeconds(_timeBetweenAsteroidsSpawns);
             _ufoSpawnDelay = new WaitForSeconds(_timeBetweenUFOSpawns);
 

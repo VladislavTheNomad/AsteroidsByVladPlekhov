@@ -12,9 +12,9 @@ namespace Asteroids
         public int GapBetweenPositionChanging { get; private set; }
 
         private PlayerView _playerView;
-        private PauseManager _pauseManager;
+        private PauseGame _pauseManager;
 
-        public UfoModel(UFOConfig config, PlayerView pv, PauseManager pm) 
+        public UfoModel(UFOConfig config, PlayerView pv, PauseGame pm) 
         {
             _playerView = pv;
             _pauseManager = pm;

@@ -19,11 +19,11 @@ namespace Asteroids
         private Camera _mainCamera;
         private UtilsCalculatePositions _utils;
         private AsteroidFactory _factory;
-        private PauseManager _pauseManager;
+        private PauseGame _pauseManager;
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
 
-        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseManager pm)
+        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseGame pm)
         {
             MaxMoveSpeed = asteroidConfig.MaxMoveSpeed;
             MinMoveSpeed = asteroidConfig.MinMoveSpeed;

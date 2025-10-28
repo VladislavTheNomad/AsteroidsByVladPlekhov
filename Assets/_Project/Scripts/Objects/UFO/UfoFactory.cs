@@ -5,6 +5,8 @@ namespace Asteroids
 {
     public class UfoFactory
     {
+        public event Action OnReturnToPool;
+
         private readonly MonoMemoryPool<UfoView> _pool;
         private readonly DiContainer _container;
         private readonly ScoreCounter _scoreCounter;
@@ -33,6 +35,7 @@ namespace Asteroids
 
         private void HandlerUfoDeath(UfoPresenter presenter, UfoView view, Action handler)
         {
+            OnReturnToPool?.Invoke();
             _scoreCounter.UnsubscribeOnDeath(presenter);
             presenter.OnDeath -= handler;
             presenter.Dispose();

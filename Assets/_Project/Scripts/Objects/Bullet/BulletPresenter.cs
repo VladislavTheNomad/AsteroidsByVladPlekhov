@@ -11,12 +11,12 @@ namespace Asteroids
         private BulletModel _model;
         private BulletView _view;
         private bool _isAlive = true;
-        private PauseManager _pauseManager;
+        private PauseGame _pauseManager;
 
         public float CurrentLifetime { get; private set; }
 
         [Inject]
-        public void Construct(BulletModel bm, PauseManager pm)
+        public void Construct(BulletModel bm, PauseGame pm)
         {
             _model = bm;
             _pauseManager = pm;

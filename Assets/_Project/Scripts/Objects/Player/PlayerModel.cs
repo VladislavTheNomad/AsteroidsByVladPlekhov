@@ -10,6 +10,8 @@ namespace Asteroids
         private const int SIZE_OF_RAYCASTHITS_ARRAY = 10;
 
         public event Action<bool> IsGamePaused;
+        public event Action BulletFired;
+        public event Action LaserFired;
 
         public Vector3 Position { get; private set; }
         public float Rotation { get; private set; }
@@ -26,14 +28,14 @@ namespace Asteroids
 
         private BulletFactory _bulletFactory;
         private HUDModel _HUDModel;
-        private PauseManager _pauseManager;
+        private PauseGame _pauseManager;
         private UtilsCalculatePositions _utils;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 
         private bool _isBulletRecharging;
         private float _rechargeBulletTimer = 0f;
 
-        public PlayerModel(PlayerConfig pc, BulletFactory bf, UtilsCalculatePositions utils, HUDModel hudModel, PauseManager pm)
+        public PlayerModel(PlayerConfig pc, BulletFactory bf, UtilsCalculatePositions utils, HUDModel hudModel, PauseGame pm)
         {
             Position = Vector3.zero;
             Rotation = 0f;
@@ -119,6 +121,7 @@ namespace Asteroids
             if (!_isBulletRecharging)
             {
                 SpawnBullet(transform);
+                BulletFired?.Invoke();
                 _isBulletRecharging = true;
             }
         }
@@ -132,6 +135,7 @@ namespace Asteroids
         {
             if (CurrentLaserShots > 0)
             {
+                LaserFired?.Invoke();
                 int rechargeSlotIndex = -1;
                 for (int i = 0; i < MaxLaserShots; i++)
                 {
@@ -177,7 +181,7 @@ namespace Asteroids
             CurrentSpeed = newSpeed;
         }
 
-        public void PauseGame() => _pauseManager.PauseGame();
+        public void PauseGame() => _pauseManager.PauseGameProcess();
 
         public int GetMaxLaserShots() => MaxLaserShots;
 

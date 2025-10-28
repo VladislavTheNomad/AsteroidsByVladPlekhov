@@ -5,6 +5,7 @@ namespace Asteroids
 {
     public class AsteroidFactory
     {
+        public Action OnReturnToPool;
 
         private readonly MonoMemoryPool<AsteroidView> _pool;
         private readonly DiContainer _container;
@@ -35,6 +36,7 @@ namespace Asteroids
 
         private void HandleAsteroidDeath(AsteroidPresenter presenter, AsteroidView view, Action handler)
         {
+            OnReturnToPool?.Invoke();
             _scoreCounter.UnsubscribeOnDeath(presenter);
             presenter.OnDeath -= handler;
             presenter.Dispose();
