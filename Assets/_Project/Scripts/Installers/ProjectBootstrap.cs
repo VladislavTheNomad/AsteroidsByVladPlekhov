@@ -19,7 +19,7 @@ namespace Asteroids
                 }
                 else
                 {
-                    Debug.LogError("Ошибка зависимостей Firebase: " + status);
+                    Debug.LogError("Ошибка Firebase: " + status);
                 }
             });
 

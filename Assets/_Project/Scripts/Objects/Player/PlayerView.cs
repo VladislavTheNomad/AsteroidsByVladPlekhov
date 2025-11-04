@@ -77,6 +77,12 @@ namespace Asteroids
             ViewTransform = GetComponent<Transform>();
 
             _playerControls = new PlayerControls();
+            RegisterDependencies();
+        }
+
+        public void RegisterDependencies()
+        {
+            if (_playerControls == null) return;
             _playerControls.Player.Enable();
             _playerControls.Player.Move.performed += context => _moveInput = context.ReadValue<float>();
             _playerControls.Player.Move.canceled += context => _moveInput = 0f;
@@ -116,14 +122,25 @@ namespace Asteroids
             {
                 savedVelocity = Rb.linearVelocity;
                 savedAngularVelocity = Rb.angularVelocity;
-                Rb.linearVelocity = Vector2.zero;
-                Rb.angularVelocity = 0f;
+                ResetVelocity();
             }
             else
             {
                 Rb.linearVelocity = savedVelocity;
                 Rb.angularVelocity = savedAngularVelocity;
             }
+        }
+
+        public void ResetVelocity()
+        {
+            Rb.linearVelocity = Vector2.zero;
+            Rb.angularVelocity = 0f;
+        }
+
+        public void ResetSavedVelocity()
+        {
+            savedVelocity = Vector2.zero;
+            savedAngularVelocity = 0f;
         }
 
         public void ShowLaserVisual()
@@ -138,6 +155,15 @@ namespace Asteroids
             _lineRenderer.positionCount = 2;
             _lineRenderer.startWidth = LASER_WIDTH;
             _lineRenderer.endWidth = LASER_WIDTH;
+        }
+
+        public void Revive()
+        {
+            ResetVelocity();
+            ResetSavedVelocity();
+            RegisterDependencies();
+            gameObject.SetActive(true);
+            Teleport(Vector3.zero);
         }
 
         private IEnumerator LaserRoutine()

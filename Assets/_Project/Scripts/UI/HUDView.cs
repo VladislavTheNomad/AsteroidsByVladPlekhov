@@ -2,7 +2,6 @@ using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using Zenject;
 
 namespace Asteroids
 {
@@ -15,6 +14,7 @@ namespace Asteroids
 
         public event Action OnRetryButtonClicked;
         public event Action OnExitButtonClicked;
+        public event Action OnRewardedButtonClicked;
 
         [SerializeField] private GameObject _gameOverMenu;
         [SerializeField] private TextMeshProUGUI _coordinatesText;
@@ -25,15 +25,18 @@ namespace Asteroids
         [SerializeField] private TextMeshProUGUI _scoreText;
         [SerializeField] private Button _retryButton;
         [SerializeField] private Button _quitButton;
+        [SerializeField] private Button _rewardedAdsButton;
 
         public void OnEnable()
         {
+            _rewardedAdsButton.onClick.AddListener(() => OnRewardedButtonClicked?.Invoke());
             _retryButton.onClick.AddListener(() => OnRetryButtonClicked?.Invoke());
             _quitButton.onClick.AddListener(() => OnExitButtonClicked?.Invoke());
         }
 
         public void OnDestroy()
         {
+            _rewardedAdsButton.onClick.RemoveListener(() => OnRewardedButtonClicked?.Invoke());
             _retryButton.onClick.RemoveListener(() => OnRetryButtonClicked?.Invoke());
             _quitButton.onClick.RemoveListener(() => OnExitButtonClicked?.Invoke());
         }
@@ -69,5 +72,14 @@ namespace Asteroids
             _gameOverMenu.SetActive(true);
         }
 
+        public void HideGameOverMenu()
+        {
+            _gameOverMenu.SetActive(false);
+        }
+
+        public void HideRewardButton()
+        {
+            _rewardedAdsButton.gameObject.SetActive(false);
+        }
     }
 }

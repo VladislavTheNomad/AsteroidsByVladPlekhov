@@ -12,6 +12,7 @@ namespace Asteroids
         public event Action<float> OnRechargeTimerUpdated;
         public event Action OnPlayerDead;
         public event Action<int> OnScoreChanged;
+        public event Action OnRevive;
 
         private int _maxShots;
         private int _currentShots;
@@ -19,14 +20,16 @@ namespace Asteroids
         private ScoreCounter _scoreCounter;
         private PauseGame _pauseManager;
         private SaveData _saveData;
+        private IAdService _adService;
 
         [Inject]
-        public HUDModel(SceneService ss, ScoreCounter sc, PauseGame pm, SaveData sd)
+        public HUDModel(SceneService ss, ScoreCounter sc, PauseGame pm, SaveData sd, IAdService adService)
         {
             _sceneService = ss;
             _scoreCounter = sc;
             _saveData = sd;
             _pauseManager = pm;
+            _adService = adService;
 
             _scoreCounter.OnScoreChanged += UpdateScore;
         }
@@ -71,12 +74,36 @@ namespace Asteroids
 
         public void RequestReloadGame()
         {
-            _sceneService.ReloadGame();
+            _adService.ShowInterstitialAd(ReloadSessionAfterAd);
         }
 
         public void RequestExitGame()
         {
             _sceneService.ExitGame();
+        }
+
+        public void RequestRewardedAd()
+        {
+            if(_saveData.HasUsedRevive == true)
+            {
+                return;
+            }
+
+            _saveData.UseRevive();
+            _adService.ShowRewardedAd(ContinueSessionAfterAd);
+        }
+
+        private void ReloadSessionAfterAd()
+        {
+            _sceneService.ReloadGame();
+        }
+
+        private void ContinueSessionAfterAd()
+        {
+            _pauseManager.PauseGameProcess();
+            OnRevive?.Invoke();
+            _saveData.UseRevive();
+            Debug.Log("Player revived after rewarded ad!");
         }
 
         public void Dispose()

@@ -4,7 +4,7 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerPresenter : IHaveDeathConditions, ILateTickable
+    public class PlayerPresenter : IHaveDeathConditions, ILateTickable, IDisposable
     {
         private PlayerModel _model;
         private PlayerView _view;
@@ -24,6 +24,7 @@ namespace Asteroids
             _view.OnPauseClick += _model.PauseGame;
 
             _model.IsGamePaused += PausePlayer;
+            _model.ReviveRequest += RevivePlayer;
         }
 
         public void LateTick()
@@ -68,18 +69,12 @@ namespace Asteroids
 
         public void HandleDeath()
         {
-            _view.Dispose();
-            _view.MoveRequested -= AddMove;
-            _view.RotateRequested -= AddTorque;
-            _view.FireBulletRequested -= FireBullet;
-            _view.FireLaserRequested -= FireLaser;
-            _view.CollisionDetected -= HandleDeath;
-            _view.OnPauseClick += _model.PauseGame;
-
-            _model.IsGamePaused += PausePlayer;
-
-            _model.RequestDeathConditions();
-            _view.gameObject.SetActive(false);
+            if (!_model.IsInvincible)
+            {
+                _view.Dispose();
+                _model.RequestDeathConditions();
+                _view.gameObject.SetActive(false);
+            }
         }
 
         private void PausePlayer(bool condition)
@@ -104,6 +99,24 @@ namespace Asteroids
 
                 _view.TogglePause(false);
             }
+        }
+
+        private void RevivePlayer()
+        {
+            _view.Revive();
+        }
+
+        public void Dispose()
+        {
+            _view.Dispose();
+            _view.MoveRequested -= AddMove;
+            _view.RotateRequested -= AddTorque;
+            _view.FireBulletRequested -= FireBullet;
+            _view.FireLaserRequested -= FireLaser;
+            _view.CollisionDetected -= HandleDeath;
+            _view.OnPauseClick -= _model.PauseGame;
+
+            _model.IsGamePaused -= PausePlayer;
         }
     }
 }

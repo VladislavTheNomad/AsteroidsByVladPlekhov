@@ -7,10 +7,13 @@ namespace Asteroids
     {
         private ScoreCounter _scoreCounter;
 
-        [Inject]
+        public bool HasUsedRevive { get; private set;}
+
+[Inject]
         public void Construct(ScoreCounter sc)
         { 
             _scoreCounter = sc;
+            HasUsedRevive = false;
         }
 
         public void SaveScore()
@@ -32,7 +35,6 @@ namespace Asteroids
             }
         }
 
-
-
+        public void UseRevive() => HasUsedRevive = true;
     }
 }

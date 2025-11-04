@@ -27,23 +27,23 @@ namespace Asteroids
             
             var assetProvider = Container.Resolve<IAssetProvider>();
 
-            var asteroidPrefab = assetProvider.LoadPrefab(_asteroidPrefabAddress);
-            var bulletPrefab = assetProvider.LoadPrefab(_bulletPrefabAddress);
-            var ufoPrefab = assetProvider.LoadPrefab(_ufoPrefabAddress);
+            var asteroidView = assetProvider.Load<AsteroidView>(_asteroidPrefabAddress);
+            var bulletView = assetProvider.Load<BulletView>(_bulletPrefabAddress);
+            var ufoView = assetProvider.Load<UfoView>(_ufoPrefabAddress);
 
             Container.BindMemoryPool<AsteroidView, MonoMemoryPool<AsteroidView>>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(asteroidPrefab).
+                FromComponentInNewPrefab(asteroidView.gameObject).
                 UnderTransformGroup("Asteroids");
 
             Container.BindMemoryPool<BulletView, BulletPool>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(bulletPrefab).
+                FromComponentInNewPrefab(bulletView.gameObject).
                 UnderTransformGroup("Bullets");
 
             Container.BindMemoryPool<UfoView, MonoMemoryPool<UfoView>>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(ufoPrefab).
+                FromComponentInNewPrefab(ufoView.gameObject).
                 UnderTransformGroup("UFO's");
 
             Container.Bind<AsteroidFactory>().AsSingle();

@@ -13,6 +13,7 @@ namespace Asteroids
         {
             _model = model;
             _view = view;
+
             RegisterDependencies();
         }
 
@@ -23,9 +24,11 @@ namespace Asteroids
             _model.OnCurrentShotsUpdated += current => _view.UpdateCurrentShots(current, _model.MaxShots);
             _model.OnRechargeTimerUpdated += _view.UpdateRechargeTimer;
             _model.OnPlayerDead += _view.ShowGameOverMenu;
-
             _model.OnScoreChanged += _view.UpdateScore;
+            _model.OnRevive += _view.HideGameOverMenu;
 
+            _view.OnRewardedButtonClicked += _model.RequestRewardedAd;
+            _view.OnRewardedButtonClicked += _view.HideRewardButton;
             _view.OnRetryButtonClicked += _model.RequestReloadGame;
             _view.OnExitButtonClicked += _model.RequestExitGame;
         }
@@ -37,11 +40,13 @@ namespace Asteroids
             _model.OnCurrentShotsUpdated -= current => _view.UpdateCurrentShots(current, _model.MaxShots);
             _model.OnRechargeTimerUpdated -= _view.UpdateRechargeTimer;
             _model.OnPlayerDead -= _view.ShowGameOverMenu;
-
             _model.OnScoreChanged -= _view.UpdateScore;
+            _model.OnRevive -= _view.HideGameOverMenu;
 
-            _view.OnRetryButtonClicked += _model.RequestReloadGame;
-            _view.OnExitButtonClicked += _model.RequestExitGame;
+            _view.OnRewardedButtonClicked -= _model.RequestRewardedAd;
+            _view.OnRewardedButtonClicked -= _view.HideRewardButton;
+            _view.OnRetryButtonClicked -= _model.RequestReloadGame;
+            _view.OnExitButtonClicked -= _model.RequestExitGame;
         }
     }
 }

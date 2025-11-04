@@ -7,7 +7,8 @@ namespace Asteroids
         public override void InstallBindings()
         {
             Container.BindInterfacesAndSelfTo<PauseGame>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle().NonLazy();   
+            Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle().NonLazy();
+            Container.Bind<IAdService>().To<UnityAdService>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
         }
     }
 }

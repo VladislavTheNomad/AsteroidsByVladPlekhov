@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -8,11 +9,12 @@ namespace Asteroids
     public class PlayerModel : ITickable, IDisposable
     {
         private const int SIZE_OF_RAYCASTHITS_ARRAY = 10;
+        private const float REVIVE_INVINCIBLE_DELAY = 3f;
 
         public event Action<bool> IsGamePaused;
         public event Action BulletFired;
         public event Action LaserFired;
-
+        public event Action ReviveRequest;
         public Vector3 Position { get; private set; }
         public float Rotation { get; private set; }
         public float CurrentSpeed { get; private set; }
@@ -25,6 +27,7 @@ namespace Asteroids
         public float LaserRechargeTime { get; private set; }
         public float[] LaserRechargeTimers { get; private set; }
         public LayerMask DestructableLayers { get; private set; }
+        public bool IsInvincible { get; private set; } = false;
 
         private BulletFactory _bulletFactory;
         private HUDModel _HUDModel;
@@ -63,6 +66,7 @@ namespace Asteroids
             _pauseManager = pm;
 
             _pauseManager.GameIsPaused += TogglePause;
+            _HUDModel.OnRevive += RevivePlayer;
 
             _HUDModel.SetMaxLaserShots(GetMaxLaserShots());
         }
@@ -70,6 +74,7 @@ namespace Asteroids
         public void Dispose()
         {
             _pauseManager.GameIsPaused -= TogglePause;
+            _HUDModel.OnRevive -= RevivePlayer;
         }
 
         public void Tick()
@@ -187,6 +192,14 @@ namespace Asteroids
 
         public void SetPosition(Vector3 pos) => Position = pos;
         public void SetRotation(float rotation) => Rotation = rotation;
+
+        private async void RevivePlayer()
+        {
+            IsInvincible = true;
+            ReviveRequest?.Invoke();
+            await Task.Delay((int)(1000 * REVIVE_INVINCIBLE_DELAY));
+            IsInvincible = false;
+        }
 
         private void TogglePause(bool condition)
         {

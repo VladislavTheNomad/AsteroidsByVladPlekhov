@@ -1,11 +1,11 @@
 using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+
 namespace Asteroids
 {
     public class SceneService
     {
-
         public event Action OnExitGame;
 
         public void ReloadGame()
