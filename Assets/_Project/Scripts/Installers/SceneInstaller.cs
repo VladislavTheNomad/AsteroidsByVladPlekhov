@@ -11,11 +11,6 @@ namespace Asteroids
         [SerializeField] private Camera _camera;
         [SerializeField] private PlayerView _playerView;
 
-        [SerializeField] private PlayerConfig _playerConfig;
-        [SerializeField] private BulletConfig _bulletConfig;
-        [SerializeField] private AsteroidConfig _asteroidConfig;
-        [SerializeField] private UFOConfig _ufoConfig;
-
         [SerializeField] private string _asteroidPrefabAddress = "Asteroid";
         [SerializeField] private string _bulletPrefabAddress = "Bullet";
         [SerializeField] private string _ufoPrefabAddress = "Ufo";
@@ -57,10 +52,10 @@ namespace Asteroids
             Container.Bind<IAnalytics>().To<FirebaseAnalyticsService>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<HUDModel>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().WithArguments(_playerConfig).NonLazy();
-            Container.BindInterfacesAndSelfTo<BulletModel>().AsSingle().WithArguments(_bulletConfig).NonLazy();
-            Container.BindInterfacesAndSelfTo<AsteroidModel>().AsSingle().WithArguments(_asteroidConfig).NonLazy();
-            Container.BindInterfacesAndSelfTo<UfoModel>().AsSingle().WithArguments(_ufoConfig).NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<BulletModel>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<AsteroidModel>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<UfoModel>().AsSingle().NonLazy();
 
             Container.BindInterfacesAndSelfTo<AsteroidPresenter>().AsTransient();
             Container.BindInterfacesAndSelfTo<UfoPresenter>().AsTransient();

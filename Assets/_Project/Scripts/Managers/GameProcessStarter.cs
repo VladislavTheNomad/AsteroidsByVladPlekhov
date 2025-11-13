@@ -7,30 +7,34 @@ namespace Asteroids
 {
     public class GameProcessStarter : MonoBehaviour, IInitializable, IDisposable
     {
-        [SerializeField] private float _timeBetweenAsteroidsSpawns;
-        [SerializeField] private float _timeBetweenUFOSpawns;
-
+        private float _timeBetweenAsteroidsSpawns;
+        private float _timeBetweenUFOSpawns;
         private WaitForSeconds _asteroidSpawnDelay;
         private WaitForSeconds _ufoSpawnDelay;
         private UtilsCalculatePositions _utilsMakeRandomStartPosition;
         private AsteroidFactory _asteroidFactory;
         private UfoFactory _ufoFactory;
         private PauseGame _pauseManager;
+        private RemoteConfigService _remoteConfigService;
         private IAnalytics _analytics;
         private bool _isPaused;
 
         [Inject]
-        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseGame pm, IAnalytics analytics)
+        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseGame pm, IAnalytics analytics, RemoteConfigService rcs)
         {
             _utilsMakeRandomStartPosition = utils;
             _asteroidFactory = af;
             _ufoFactory = uf;
             _pauseManager = pm;
             _analytics = analytics;
+            _remoteConfigService = rcs;
         }
 
         public void Initialize()
         {
+            _timeBetweenAsteroidsSpawns = _remoteConfigService.Config.TimeBetweenAsteroidsSpawns;
+            _timeBetweenUFOSpawns = _remoteConfigService.Config.TimeBetweenUFOSpawns;
+
             _analytics.LogGameStart();
 
             _asteroidSpawnDelay = new WaitForSeconds(_timeBetweenAsteroidsSpawns);

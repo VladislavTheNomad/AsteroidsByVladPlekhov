@@ -8,20 +8,20 @@ namespace Asteroids
         public event Action<bool> IsGamePaused;
 
         public int ScorePoints { get; private set; }
-        public int MoveSpeed { get; private set; }
-        public int GapBetweenPositionChanging { get; private set; }
+        public float MoveSpeed { get; private set; }
+        public float GapBetweenPositionChanging { get; private set; }
 
         private PlayerView _playerView;
         private PauseGame _pauseManager;
 
-        public UfoModel(UFOConfig config, PlayerView pv, PauseGame pm) 
+        public UfoModel(RemoteConfigService configService, PlayerView pv, PauseGame pm) 
         {
             _playerView = pv;
             _pauseManager = pm;
 
-            ScorePoints = config.ScorePoints;
-            MoveSpeed = config.MoveSpeed;
-            GapBetweenPositionChanging = config.GapBetweenPositionChanging;
+            ScorePoints = configService.Config.UFOScorePoints;
+            MoveSpeed = configService.Config.UFOMoveSpeed;
+            GapBetweenPositionChanging = configService.Config.GapBetweenPositionChanging;
 
             _pauseManager.GameIsPaused += TogglePause;
         }

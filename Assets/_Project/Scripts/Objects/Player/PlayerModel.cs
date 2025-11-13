@@ -9,7 +9,6 @@ namespace Asteroids
     public class PlayerModel : ITickable, IDisposable
     {
         private const int SIZE_OF_RAYCASTHITS_ARRAY = 10;
-        private const float REVIVE_INVINCIBLE_DELAY = 3f;
 
         public event Action<bool> IsGamePaused;
         public event Action BulletFired;
@@ -28,6 +27,7 @@ namespace Asteroids
         public float[] LaserRechargeTimers { get; private set; }
         public LayerMask DestructableLayers { get; private set; }
         public bool IsInvincible { get; private set; } = false;
+        public float InvincibleTime { get; private set; }
 
         private BulletFactory _bulletFactory;
         private HUDModel _HUDModel;
@@ -35,22 +35,25 @@ namespace Asteroids
         private UtilsCalculatePositions _utils;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
 
+
         private bool _isBulletRecharging;
         private float _rechargeBulletTimer = 0f;
 
-        public PlayerModel(PlayerConfig pc, BulletFactory bf, UtilsCalculatePositions utils, HUDModel hudModel, PauseGame pm)
+        [Inject]
+        public PlayerModel(BulletFactory bf, UtilsCalculatePositions utils, HUDModel hudModel, PauseGame pm, RemoteConfigService rcs)
         {
             Position = Vector3.zero;
             Rotation = 0f;
             CurrentSpeed = 0f;
 
-            MovementSpeed = pc.MovementSpeed;
-            RotationSpeed = pc.RotationSpeed;
-            BulletRechargeTime = pc.BulletRechargeTime;
-            LaserRechargeTime = pc.LaserRechargeTime;
-            DestructableLayers = pc.DestructableLayers;
-            MaxLaserShots = pc.MaxLaserShots;
-            LaserDistance = pc.LaserDistance;
+            MovementSpeed = rcs.Config.MovementSpeed;
+            RotationSpeed = rcs.Config.RotationSpeed;
+            BulletRechargeTime = rcs.Config.BulletRechargeTime;
+            LaserRechargeTime = rcs.Config.LaserRechargeTime;
+            DestructableLayers = rcs.Config.DestructableLayers;
+            MaxLaserShots = rcs.Config.MaxLaserShots;
+            LaserDistance = rcs.Config.LaserDistance;
+            InvincibleTime = rcs.Config.InvincibleTime;
 
             CurrentLaserShots = MaxLaserShots;
             LaserRechargeTimers = new float[MaxLaserShots];
@@ -197,7 +200,7 @@ namespace Asteroids
         {
             IsInvincible = true;
             ReviveRequest?.Invoke();
-            await Task.Delay((int)(1000 * REVIVE_INVINCIBLE_DELAY));
+            await Task.Delay((int)(1000 * InvincibleTime));
             IsInvincible = false;
         }
 
@@ -236,6 +239,6 @@ namespace Asteroids
             _HUDModel.UpdateCurrentShots(CurrentLaserShots);
             _HUDModel.UpdateSpeed(CurrentSpeed);
             _HUDModel.UpdateCoordinates(Position, Rotation);
-        }
+        }        
     }
 }

@@ -23,14 +23,14 @@ namespace Asteroids
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
 
-        public AsteroidModel(AsteroidConfig asteroidConfig, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseGame pm)
+        public AsteroidModel(RemoteConfigService configService, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseGame pm)
         {
-            MaxMoveSpeed = asteroidConfig.MaxMoveSpeed;
-            MinMoveSpeed = asteroidConfig.MinMoveSpeed;
-            AccelerationModificator = asteroidConfig.AccelerationModificator;
-            MaxSizeLevel = asteroidConfig.MaxSizeLevel;
-            SmallAsteroidQuantity = asteroidConfig.SmallAsteroidQuantity;
-            ScorePoints = asteroidConfig.ScorePoints;
+            MaxMoveSpeed = configService.Config.MaxMoveSpeed;
+            MinMoveSpeed = configService.Config.MinMoveSpeed;
+            AccelerationModificator = configService.Config.AccelerationModificator;
+            MaxSizeLevel = configService.Config.MaxSizeLevel;
+            SmallAsteroidQuantity = configService.Config.SmallAsteroidQuantity;
+            ScorePoints = configService.Config.AsteroidScorePoints;
 
             _mainCamera = camera;
             _utils = utils;
