@@ -6,11 +6,14 @@ namespace Asteroids
     {
         public override void InstallBindings()
         {
-            Container.BindInterfacesAndSelfTo<PauseGame>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle().NonLazy();
-            Container.Bind<IAdService>().To<UnityAdService>().FromNewComponentOnNewGameObject().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<RemoteConfigService>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<IAPService>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<PauseGame>().AsSingle();
+            Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle();
+            Container.Bind<ProductList>().AsSingle();
+            Container.BindInterfacesAndSelfTo<IAPService>().AsSingle();
+            Container.Bind<IAdService>().To<UnityAdService>().FromNewComponentOnNewGameObject().AsSingle();
+            Container.BindInterfacesAndSelfTo<SaveData>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<GameConfigs>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<RemoteConfigService>().AsSingle();
         }
     }
 }

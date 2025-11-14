@@ -1,10 +1,11 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
     [Serializable]
-    public class GameConfigs
+    public class GameConfigs : IInitializable
     {
         // asteroids
         public float MaxMoveSpeed = 60f;
@@ -26,7 +27,7 @@ namespace Asteroids
         public float MovementSpeed = 10f;
         public float BulletRechargeTime = 0.4f;
         public float LaserRechargeTime = 10f;
-        public LayerMask DestructableLayers = LayerMask.GetMask("Enemy");
+        public LayerMask DestructableLayers;
         public float InvincibleTime = 3f;
 
         //UFO
@@ -37,5 +38,10 @@ namespace Asteroids
         //GameProcess
         public float TimeBetweenAsteroidsSpawns = 1f;
         public float TimeBetweenUFOSpawns = 5f;
+
+        public void Initialize()
+        {
+            DestructableLayers = LayerMask.GetMask("Enemy");
+        }
     }
 }

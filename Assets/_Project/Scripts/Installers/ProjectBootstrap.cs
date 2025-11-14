@@ -4,15 +4,24 @@ using Firebase;
 using System.Threading.Tasks;
 using Firebase.RemoteConfig;
 using System.Collections.Generic;
+using Zenject;
 
 namespace Asteroids
 {
     public class ProjectBootstrap : MonoBehaviour
     {
+        private GameConfigs _gameConfigs;
+
+        [Inject]
+        public void Construct(GameConfigs gameConfigs)
+        {
+            _gameConfigs = gameConfigs;
+        }
+
         private async void Start()
         {
             await InitializeFirebaseAndLoadConfigs();
-            SceneManager.LoadScene("MainScene");
+            SceneManager.LoadScene("Menu");
         }
 
         private async Task InitializeFirebaseAndLoadConfigs()
@@ -35,10 +44,13 @@ namespace Asteroids
         {
             FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.DefaultInstance;
 
+            string json = JsonUtility.ToJson(_gameConfigs);
+
             Dictionary<string, object> defaults = new Dictionary<string, object>
             {
-                { "AsteroidData", "{\"LaserRechargeTime\":10,\"BulletRechargeTime\":0.4,\"MovementSpeed\":10,\"RotationSpeed\":40,\"TimeBetweenAsteroidsSpawns\":3,\"TimeBetweenUFOSpawns\":3}" }
+                { "AsteroidData", json }
             };
+
             await remoteConfig.SetDefaultsAsync(defaults);
 
             await remoteConfig.FetchAsync(System.TimeSpan.FromHours(0));

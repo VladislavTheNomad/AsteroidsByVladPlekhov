@@ -46,7 +46,7 @@ namespace Asteroids
             Container.Bind<UfoFactory>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<SaveData>().AsSingle().NonLazy();
+            //Container.BindInterfacesAndSelfTo<SaveData>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<SceneService>().AsSingle().NonLazy();
             Container.Bind<Statistics>().AsSingle().NonLazy();
             Container.Bind<IAnalytics>().To<FirebaseAnalyticsService>().AsSingle().NonLazy();

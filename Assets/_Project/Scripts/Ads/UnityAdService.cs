@@ -23,6 +23,13 @@ namespace Asteroids
         private string _rewardedAdUnitId;
         private string _interstitialAdUnitId;
         private bool _isRewardedReady = false;
+        private SaveData _saveData;
+
+        [Inject]
+        public void Construct(SaveData saveData)
+        {
+            _saveData = saveData;
+        }
 
         private void Awake()
         {
@@ -65,6 +72,12 @@ namespace Asteroids
 
         public void ShowInterstitialAd(Action onInterstitialComplete)
         {
+            if (_saveData.HasAdBlock)
+            {
+                onInterstitialComplete?.Invoke();
+                return;
+            }
+
             currentInterstitialCallback = onInterstitialComplete;
             Advertisement.Show(_interstitialAdUnitId, this);
         }

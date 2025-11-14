@@ -11,9 +11,15 @@ namespace Asteroids
     {
         private StoreController _storeController;
         private Dictionary<string, ProductType> _products;
-        private string _adBlockProductId = "no_ads";
+        private ProductList _productList;
 
         public Dictionary<string, bool> Entitlements { get; private set; }
+
+        [Inject]
+        public void Construct(ProductList productList)
+        {
+            _productList = productList;
+        }
 
         public async void Initialize()
         {
@@ -26,7 +32,7 @@ namespace Asteroids
 
             await _storeController.Connect();
 
-            _products = new Dictionary<string, ProductType> { { _adBlockProductId,  ProductType.NonConsumable } };
+            _products = _productList.Products;
             Entitlements = new Dictionary<string, bool>();
 
             foreach (var product in _products)
