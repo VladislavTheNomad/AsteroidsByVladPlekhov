@@ -1,3 +1,4 @@
+using UnityEngine;
 using Zenject;
 
 namespace Asteroids
@@ -6,13 +7,18 @@ namespace Asteroids
     {
         public override void InstallBindings()
         {
+            Container.BindInterfacesAndSelfTo<CloudData>().AsSingle();
             Container.BindInterfacesAndSelfTo<PauseGame>().AsSingle();
             Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle();
-            Container.Bind<ProductList>().AsSingle();
-            Container.BindInterfacesAndSelfTo<IAPService>().AsSingle();
-            Container.Bind<IAdService>().To<UnityAdService>().FromNewComponentOnNewGameObject().AsSingle();
-            Container.BindInterfacesAndSelfTo<SaveData>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<GameConfigs>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<IAPProductList>().AsSingle();
+            Container.BindInterfacesAndSelfTo<IAPService>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<UnityAdService>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<StoredDataHandler>().AsSingle().NonLazy();
+
+            var configs = new GameConfigs();
+            configs.DestructableLayers = LayerMask.GetMask("Enemy");
+            Container.Bind<GameConfigs>().FromInstance(configs).AsSingle().NonLazy();
+            
             Container.BindInterfacesAndSelfTo<RemoteConfigService>().AsSingle();
         }
     }

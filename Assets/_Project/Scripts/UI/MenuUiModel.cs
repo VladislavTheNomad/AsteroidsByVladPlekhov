@@ -6,10 +6,10 @@ namespace Asteroids
     public class MenuUiModel
     {
         private IAPService _iapService;
-        private ProductList _productList;
+        private IAPProductList _productList;
 
         [Inject]
-        public void Construct(IAPService iapService, ProductList productList)
+        public void Construct(IAPService iapService, IAPProductList productList)
         {
             _iapService = iapService;
             _productList = productList;

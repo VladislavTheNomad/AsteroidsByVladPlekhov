@@ -7,16 +7,16 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class IAPService : IInitializable, IDisposable
+    public class IAPService : IInitializable, IStoreService, IDisposable
     {
         private StoreController _storeController;
         private Dictionary<string, ProductType> _products;
-        private ProductList _productList;
+        private IAPProductList _productList;
 
         public Dictionary<string, bool> Entitlements { get; private set; }
 
         [Inject]
-        public void Construct(ProductList productList)
+        public void Construct(IAPProductList productList)
         {
             _productList = productList;
         }
@@ -56,6 +56,18 @@ namespace Asteroids
         public void BuyProduct(string id)
         {
             _storeController.PurchaseProduct(id);
+        }
+
+        public bool CheckProductStatus(string id)
+        {
+            if (Entitlements[id] == true)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
 
         private void FetchProducts()

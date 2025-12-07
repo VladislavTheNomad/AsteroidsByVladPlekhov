@@ -26,11 +26,20 @@ namespace Asteroids
             _model.OnPlayerDead += _view.ShowGameOverMenu;
             _model.OnScoreChanged += _view.UpdateScore;
             _model.OnRevive += _view.HideGameOverMenu;
+            _model.OnBestScoreSetup += _view.UpdateBestScore;
+            _model.OnNewRecord += _view.ShowNewRecordUI;
 
             _view.OnRewardedButtonClicked += _model.RequestRewardedAd;
             _view.OnRewardedButtonClicked += _view.HideRewardButton;
             _view.OnRetryButtonClicked += _model.RequestReloadGame;
             _view.OnExitButtonClicked += _model.RequestExitGame;
+
+            _view.OnSaveToLocalClicked += _model.SaveScoreToLocal;
+            _view.OnSaveToLocalClicked += _view.HideNewRecordUI;
+            _view.OnSaveToLocalClicked += _view.ShowGameOverMenu;
+            _view.OnSaveToCloudClicked += _model.SaveScoreToCloud;
+            _view.OnSaveToCloudClicked += _view.HideNewRecordUI;
+            _view.OnSaveToCloudClicked += _view.ShowGameOverMenu;
         }
 
         public void Dispose()
@@ -42,11 +51,20 @@ namespace Asteroids
             _model.OnPlayerDead -= _view.ShowGameOverMenu;
             _model.OnScoreChanged -= _view.UpdateScore;
             _model.OnRevive -= _view.HideGameOverMenu;
+            _model.OnBestScoreSetup -= _view.UpdateBestScore;
+            _model.OnNewRecord -= _view.ShowNewRecordUI;
 
             _view.OnRewardedButtonClicked -= _model.RequestRewardedAd;
             _view.OnRewardedButtonClicked -= _view.HideRewardButton;
             _view.OnRetryButtonClicked -= _model.RequestReloadGame;
             _view.OnExitButtonClicked -= _model.RequestExitGame;
+
+            _view.OnSaveToLocalClicked -= _model.SaveScoreToLocal;
+            _view.OnSaveToLocalClicked -= _view.HideNewRecordUI;
+            _view.OnSaveToLocalClicked -= _view.ShowGameOverMenu;
+            _view.OnSaveToCloudClicked -= _model.SaveScoreToCloud;
+            _view.OnSaveToCloudClicked -= _view.HideNewRecordUI;
+            _view.OnSaveToCloudClicked -= _view.ShowGameOverMenu;
         }
     }
 }

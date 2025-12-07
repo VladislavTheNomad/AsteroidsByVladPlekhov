@@ -5,7 +5,7 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class UnityAdService : MonoBehaviour, IAdService, IInitializable, IUnityAdsInitializationListener, IUnityAdsLoadListener, IUnityAdsShowListener
+    public class UnityAdService : IAdService, IInitializable, IUnityAdsInitializationListener, IUnityAdsLoadListener, IUnityAdsShowListener
     {
         private Action currentRewardCallback;
         private Action currentInterstitialCallback;
@@ -23,17 +23,12 @@ namespace Asteroids
         private string _rewardedAdUnitId;
         private string _interstitialAdUnitId;
         private bool _isRewardedReady = false;
-        private SaveData _saveData;
+        private StoredDataHandler _saveData;
 
         [Inject]
-        public void Construct(SaveData saveData)
+        public void Construct(StoredDataHandler saveData)
         {
             _saveData = saveData;
-        }
-
-        private void Awake()
-        {
-            Initialize();
         }
 
         public void Initialize()

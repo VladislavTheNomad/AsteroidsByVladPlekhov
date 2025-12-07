@@ -1,10 +1,12 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.Events;
 using Zenject;
 
 namespace Asteroids
 {
-    public class HUDModel : IDisposable
+    public class HUDModel : IInitializable, IDisposable
     {
         public event Action<Vector2, float> OnCoordinatesUpdated;
         public event Action<float> OnSpeedUpdated;
@@ -13,26 +15,45 @@ namespace Asteroids
         public event Action OnPlayerDead;
         public event Action<int> OnScoreChanged;
         public event Action OnRevive;
+        public event Action OnNewRecord;
+        public event Action<int> OnBestScoreSetup;
 
         private int _maxShots;
         private int _currentShots;
         private SceneService _sceneService;
         private ScoreCounter _scoreCounter;
         private PauseGame _pauseManager;
-        private SaveData _saveData;
+        private StoredDataHandler _storedDataHandler;
         private IAdService _adService;
+        private int _currentBestScore;
 
         [Inject]
-        public HUDModel(SceneService ss, ScoreCounter sc, PauseGame pm, SaveData sd, IAdService adService)
+        public HUDModel(SceneService ss, ScoreCounter sc, PauseGame pm, StoredDataHandler sd, IAdService adService)
         {
             _sceneService = ss;
             _scoreCounter = sc;
-            _saveData = sd;
+            _storedDataHandler = sd;
             _pauseManager = pm;
             _adService = adService;
 
             _scoreCounter.OnScoreChanged += UpdateScore;
+            _storedDataHandler.OnChoosePlaceToSave += ReachNewRecord;
+            _storedDataHandler.OnSaveScoreAfterDeath += PlayerDeath;
+        }        
+
+        public async void Initialize()
+        {
+            _currentBestScore = await _storedDataHandler.GetBestScoreAndUpdateData();
+            OnBestScoreSetup?.Invoke(_currentBestScore);
         }
+
+        public void Dispose()
+        {
+            _scoreCounter.OnScoreChanged -= UpdateScore;
+            _storedDataHandler.OnChoosePlaceToSave -= ReachNewRecord;
+            _storedDataHandler.OnSaveScoreAfterDeath -= PlayerDeath;
+        }
+
 
         public void UpdateScore(int score)
         {
@@ -65,11 +86,24 @@ namespace Asteroids
             OnRechargeTimerUpdated?.Invoke(time);
         }
 
-        public void PlayerDead()
+        public async Task PlayerDead()
+        {
+            _pauseManager.PauseGameProcess();
+            int currentScore = _scoreCounter.GetCurrentScore();
+
+            if (currentScore > _currentBestScore)
+            {
+                await _storedDataHandler.SaveScoreAsync(currentScore);
+            }
+            else
+            {
+                PlayerDeath();
+            }
+        }
+
+        private void PlayerDeath()
         {
             OnPlayerDead?.Invoke();
-            _saveData.SaveScore();
-            _pauseManager.PauseGameProcess();
         }
 
         public void RequestReloadGame()
@@ -84,13 +118,18 @@ namespace Asteroids
 
         public void RequestRewardedAd()
         {
-            if(_saveData.HasUsedRevive == true)
+            if(_storedDataHandler.HasUsedRevive == true)
             {
                 return;
             }
 
-            _saveData.UseRevive();
+            _storedDataHandler.UseRevive();
             _adService.ShowRewardedAd(ContinueSessionAfterAd);
+        }
+
+        public void ReachNewRecord()
+        {
+            OnNewRecord?.Invoke();
         }
 
         private void ReloadSessionAfterAd()
@@ -102,13 +141,19 @@ namespace Asteroids
         {
             _pauseManager.PauseGameProcess();
             OnRevive?.Invoke();
-            _saveData.UseRevive();
+            _storedDataHandler.UseRevive();
             Debug.Log("Player revived after rewarded ad!");
         }
 
-        public void Dispose()
+        
+        public void SaveScoreToLocal()
         {
-            _scoreCounter.OnScoreChanged -= UpdateScore;
+            _storedDataHandler.SaveToLocal();
+        }
+
+        public void SaveScoreToCloud()
+        {
+            _storedDataHandler.SaveToCloud();
         }
 
         public int MaxShots => _maxShots;

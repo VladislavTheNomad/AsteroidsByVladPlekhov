@@ -16,11 +16,12 @@ namespace Asteroids
         private UfoFactory _ufoFactory;
         private PauseGame _pauseManager;
         private RemoteConfigService _remoteConfigService;
+        private StoredDataHandler _saveData;
         private IAnalytics _analytics;
         private bool _isPaused;
 
         [Inject]
-        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseGame pm, IAnalytics analytics, RemoteConfigService rcs)
+        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseGame pm, IAnalytics analytics, RemoteConfigService rcs, StoredDataHandler sd)
         {
             _utilsMakeRandomStartPosition = utils;
             _asteroidFactory = af;
@@ -28,6 +29,7 @@ namespace Asteroids
             _pauseManager = pm;
             _analytics = analytics;
             _remoteConfigService = rcs;
+            _saveData = sd;
         }
 
         public void Initialize()
@@ -35,12 +37,14 @@ namespace Asteroids
             _timeBetweenAsteroidsSpawns = _remoteConfigService.Config.TimeBetweenAsteroidsSpawns;
             _timeBetweenUFOSpawns = _remoteConfigService.Config.TimeBetweenUFOSpawns;
 
-            _analytics.LogGameStart();
-
             _asteroidSpawnDelay = new WaitForSeconds(_timeBetweenAsteroidsSpawns);
             _ufoSpawnDelay = new WaitForSeconds(_timeBetweenUFOSpawns);
 
+            _analytics.LogGameStart();
+
             _pauseManager.GameIsPaused += TogglePause;
+
+            _saveData.CheckPurchasedProducts();
 
             StartCoroutine(AsteroidsSpawn());
             StartCoroutine(UFOSpawn());

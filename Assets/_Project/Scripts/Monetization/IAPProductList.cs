@@ -1,15 +1,13 @@
 using System.Collections.Generic;
 using UnityEngine.Purchasing;
-using Zenject;
 
 namespace Asteroids
 {
-    public class ProductList
+    public class IAPProductList : IProductList
     {
         public Dictionary<string, ProductType> Products { get; private set; }
 
-        [Inject]
-        public ProductList()
+        public IAPProductList()
         {
             Products = new Dictionary<string, ProductType> { { "no_ads", ProductType.NonConsumable } };
         }
