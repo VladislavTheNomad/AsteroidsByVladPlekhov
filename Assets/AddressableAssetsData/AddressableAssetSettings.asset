@@ -15,20 +15,20 @@ MonoBehaviour:
   m_DefaultGroup: f2dd1f7250cbf3d4985cf1127e0c6088
   m_currentHash:
     serializedVersion: 2
-    Hash: 00000000000000000000000000000000
+    Hash: 16741272eec84f8a85f2b7cd08f6a7d4
   m_OptimizeCatalogSize: 0
-  m_BuildRemoteCatalog: 0
+  m_BuildRemoteCatalog: 1
   m_CatalogRequestsTimeout: 0
   m_DisableCatalogUpdateOnStart: 0
   m_InternalIdNamingMode: 0
   m_InternalBundleIdMode: 1
   m_AssetLoadMode: 0
   m_BundledAssetProviderType:
-    m_AssemblyName: 
-    m_ClassName: 
+    m_AssemblyName: Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_ClassName: UnityEngine.ResourceManagement.ResourceProviders.BundledAssetProvider
   m_AssetBundleProviderType:
-    m_AssemblyName: 
-    m_ClassName: 
+    m_AssemblyName: Unity.ResourceManager, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+    m_ClassName: UnityEngine.ResourceManagement.ResourceProviders.AssetBundleProvider
   m_IgnoreUnsupportedFilesInBuild: 0
   m_UniqueBundleIds: 0
   m_EnableJsonCatalog: 0
@@ -53,7 +53,7 @@ MonoBehaviour:
     m_Id: 
   m_RemoteCatalogLoadPath:
     m_Id: 
-  m_ContentStateBuildPathProfileVariableName: 
+  m_ContentStateBuildPathProfileVariableName: <default settings path>
   m_CustomContentStateBuildPath: 
   m_ContentStateBuildPath: 
   m_BuildAddressablesWithPlayerBuild: 0
@@ -65,6 +65,20 @@ MonoBehaviour:
     m_BundleBuildPath: Temp/com.unity.addressables/AssetBundles
   m_ProfileSettings:
     m_Profiles:
+    - m_InheritedParent: 
+      m_Id: 07929d42135fa014a8e4fe3763f96e14
+      m_ProfileName: New Profile
+      m_Values:
+      - m_Id: 2526804e34660f44098493b517948bc9
+        m_Value: '{UnityEngine.AddressableAssets.Addressables.RuntimePath}/[BuildTarget]'
+      - m_Id: aca54e60b0058984e96c4e81cf7b70e6
+        m_Value: 'ServerData/[BuildTarget]'
+      - m_Id: bf392b0bf84223e4c9091b47e1ddd23e
+        m_Value: '[UnityEngine.AddressableAssets.Addressables.BuildPath]/[BuildTarget]'
+      - m_Id: e7419c0f35b645441859ac5dcb642406
+        m_Value: '[UnityEditor.EditorUserBuildSettings.activeBuildTarget]'
+      - m_Id: fee6af20c66e0824c9a4ec39b3020b00
+        m_Value: 'https://storage.googleapis.com/remote-addressables-vlad-the-nomad/[BuildTarget]'
     - m_InheritedParent: 
       m_Id: 386eaf33a237e184ea90a921fdeda7a4
       m_ProfileName: Default
@@ -111,4 +125,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: d93af0357daca624ba06b543159d404c, type: 2}
   - {fileID: 11400000, guid: fdedc6035a8f14f419f046139d049b1d, type: 2}
   - {fileID: 11400000, guid: 19eda78e96ba5fa459f13401bff0ad68, type: 2}
-  m_ActiveProfileId: 386eaf33a237e184ea90a921fdeda7a4
+  m_ActiveProfileId: 07929d42135fa014a8e4fe3763f96e14

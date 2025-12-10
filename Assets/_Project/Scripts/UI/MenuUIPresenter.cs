@@ -1,5 +1,4 @@
 using System;
-using UnityEngine;
 using Zenject;
 
 namespace Asteroids
@@ -15,17 +14,28 @@ namespace Asteroids
             _uiView = view;
             _uiModel = model;
         }
+        
+        public void Initialize()
+        {
+            _uiView.OnGameStartClicked += _uiModel.StartGame;
+            _uiView.OnBuyAdBlockClicked += _uiModel.BuyAdBlock;
+            _uiView.OnReadyForDownloads += OnReadyForDownloadsAsync;
+
+            _uiModel.OnDownloadRemoteDataCompleted += _uiView.GetAccessToStartButton;
+        }
 
         public void Dispose()
         {
             _uiView.OnGameStartClicked -= _uiModel.StartGame;
             _uiView.OnBuyAdBlockClicked -= _uiModel.BuyAdBlock;
+            _uiView.OnReadyForDownloads -= OnReadyForDownloadsAsync;
+            
+            _uiModel.OnDownloadRemoteDataCompleted -= _uiView.GetAccessToStartButton;
         }
-
-        public void Initialize()
+        
+        private async void OnReadyForDownloadsAsync()
         {
-            _uiView.OnGameStartClicked += _uiModel.StartGame;
-            _uiView.OnBuyAdBlockClicked += _uiModel.BuyAdBlock;
+            await _uiModel.StartDownloadRemoteAddressables();
         }
     }
 }

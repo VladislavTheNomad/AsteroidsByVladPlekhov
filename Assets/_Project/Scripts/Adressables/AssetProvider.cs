@@ -9,6 +9,7 @@ namespace Asteroids
     public class AssetProvider : IAssetProvider, IDisposable
     {
         private List<AsyncOperationHandle<GameObject>> _handles = new List<AsyncOperationHandle<GameObject>>();
+        
 
         public void Dispose()
         {
