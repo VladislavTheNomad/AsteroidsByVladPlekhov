@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -14,18 +14,21 @@ namespace Asteroids
         private IStoreService _storeService;
         private IProductList _productList;
         private CloudData _cloudData;
+        private StoredDataNames _storedDataNames;
+        private DataToSave _currentData;
         private int _newBestScore;
 
         public bool HasUsedRevive { get; private set; }
-        public bool HasAdBlock { get; private set; }
 
 
         [Inject]
-        public void Construct(IStoreService storeService, IProductList productList, CloudData cd)
+        public void Construct(IStoreService storeService, IProductList productList, CloudData cd, StoredDataNames storedDataNames, DataToSave currentData)
         {
             _storeService = storeService;
             _productList = productList;
             _cloudData = cd;
+            _storedDataNames = storedDataNames;
+            _currentData = currentData;
         }
 
         public void Initialize()
@@ -37,27 +40,11 @@ namespace Asteroids
         {
             if (_storeService.CheckProductStatus(_productList.GetAdBlockKey()))
             {
-                HasAdBlock = true;
-                SaveAdBlock();
-            }
-
-            if (PlayerPrefs.HasKey("AdBlock"))
-            {
-                string hasAdBlock = PlayerPrefs.GetString("AdBlock");
-
-                if (hasAdBlock == "true")
-                {
-                    HasAdBlock = true;
-                }
+                _currentData._hasAdBlock =  true;
             }
         }
 
-        private void SaveAdBlock()
-        {
-            PlayerPrefs.SetString("AdBlock", "true");
-        }
-
-        public async Task SaveScoreAsync(int currentScore)
+        public async UniTask SaveScoreAsync(int currentScore)
         {
             _newBestScore = currentScore;
 
@@ -68,9 +55,8 @@ namespace Asteroids
             }
             else
             {
-                (int score, string date) clodData = (0, "");
-                clodData = await _cloudData.LoadDataFromCloud();
-                string cloudScoreDate = clodData.date;
+                var cloudData = await _cloudData.LoadDataFromCloud();
+                string cloudScoreDate = cloudData._saveDate;
                 DateTime.TryParseExact(
                     cloudScoreDate,
                     "yyyy:MM:dd - HH:mm:ss",
@@ -80,7 +66,7 @@ namespace Asteroids
                     );
                 Debug.Log(resultCloud);
 
-                string localScoreDate = PlayerPrefs.GetString("BestScoreDate");
+                string localScoreDate = _currentData._saveDate;
 
                 DateTime.TryParseExact(
                     localScoreDate,
@@ -98,8 +84,7 @@ namespace Asteroids
                 }
                 else
                 {
-                    Debug.Log("Локальная дата не новее облачной");
-                    SaveToCloud();
+                    await SaveToCloudAsync();
                     OnSaveScoreAfterDeath?.Invoke();
                 }
             }
@@ -107,28 +92,36 @@ namespace Asteroids
 
         public void UseRevive() => HasUsedRevive = true;
 
-        public async Task<int> GetBestScoreAndUpdateData()
+        public async UniTask<int> GetBestScoreAndUpdateData()
         {
             int bestFromCloud = 0;
             int bestFromLocal = 0;
-            (int score, string date) cloudData = (0, "");
 
             if (Application.internetReachability != NetworkReachability.NotReachable)
             {
-                cloudData = await _cloudData.LoadDataFromCloud();
-                bestFromCloud = cloudData.score;
+                var cloudData = await _cloudData.LoadDataFromCloud();
+                bestFromCloud = cloudData._bestScore;
             }
 
-            if (PlayerPrefs.HasKey("AdBlock"))
+            if (PlayerPrefs.HasKey(_storedDataNames.DATA_NAME))
             {
-                bestFromLocal = PlayerPrefs.GetInt("BestScore");
+                string dataString = PlayerPrefs.GetString(_storedDataNames.DATA_NAME);
+                if (!string.IsNullOrEmpty(dataString))
+                {
+                    _currentData = JsonUtility.FromJson<DataToSave>(dataString);
+                    bestFromLocal = _currentData._bestScore;
+                }
+                else
+                {
+                    Debug.LogWarning($"Data {_storedDataNames.DATA_NAME} could not be loaded.");
+                }
             }
 
             int bestScore = bestFromCloud > bestFromLocal ? bestFromCloud : bestFromLocal;
 
             if (bestScore == bestFromLocal && Application.internetReachability != NetworkReachability.NotReachable)
             {
-                SaveToCloud();
+                await SaveToCloudAsync();
             }
             else if (bestScore == bestFromCloud && Application.internetReachability != NetworkReachability.NotReachable)
             {
@@ -139,17 +132,20 @@ namespace Asteroids
             return bestScore;
         }
 
-        public void SaveToCloud()
+        public async UniTask SaveToCloudAsync()
         {
-            _cloudData.SaveDataToCloud(_newBestScore);
+            _currentData._bestScore = _newBestScore;
+            _currentData._saveDate = DateTime.Now.ToString("yyyy:MM:dd - HH:mm:ss");
+            await _cloudData.SaveDataToCloud(_currentData);
         }
 
         public void SaveToLocal()
         {
-            PlayerPrefs.SetInt("BestScore", _newBestScore);
-
-            string date = DateTime.Now.ToString("yyyy:MM:dd - HH:mm:ss");
-            PlayerPrefs.SetString("BestScoreDate", date);
+            _currentData._bestScore = _newBestScore;
+            _currentData._saveDate = DateTime.Now.ToString("yyyy:MM:dd - HH:mm:ss");
+            string json = JsonUtility.ToJson(_currentData);
+            PlayerPrefs.SetString(_storedDataNames.DATA_NAME, json);
+            PlayerPrefs.Save();
         }
     }
 }

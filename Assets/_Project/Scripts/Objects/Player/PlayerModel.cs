@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -26,11 +26,11 @@ namespace Asteroids
         public float LaserRechargeTime { get; private set; }
         public float[] LaserRechargeTimers { get; private set; }
         public LayerMask DestructableLayers { get; private set; }
-        public bool IsInvincible { get; private set; } = false;
+        public bool IsInvincible { get; private set; }
         public float InvincibleTime { get; private set; }
 
         private BulletFactory _bulletFactory;
-        private HUDModel _HUDModel;
+        private HUDModel _hudModel;
         private PauseGame _pauseManager;
         private UtilsCalculatePositions _utils;
         private readonly RaycastHit2D[] _raycastHits = new RaycastHit2D[SIZE_OF_RAYCASTHITS_ARRAY];
@@ -65,19 +65,19 @@ namespace Asteroids
 
             _bulletFactory = bf;
             _utils = utils;
-            _HUDModel = hudModel;
+            _hudModel = hudModel;
             _pauseManager = pm;
 
             _pauseManager.GameIsPaused += TogglePause;
-            _HUDModel.OnRevive += RevivePlayer;
+            _hudModel.OnRevive += OnReviveHandler;
 
-            _HUDModel.SetMaxLaserShots(GetMaxLaserShots());
+            _hudModel.SetMaxLaserShots(GetMaxLaserShots());
         }
 
         public void Dispose()
         {
             _pauseManager.GameIsPaused -= TogglePause;
-            _HUDModel.OnRevive -= RevivePlayer;
+            _hudModel.OnRevive -= OnReviveHandler;
         }
 
         public void Tick()
@@ -128,15 +128,10 @@ namespace Asteroids
         {
             if (!_isBulletRecharging)
             {
-                SpawnBullet(transform);
+                _bulletFactory.GetBulletFromPool(transform);
                 BulletFired?.Invoke();
                 _isBulletRecharging = true;
             }
-        }
-
-        public void SpawnBullet(Transform transform)
-        {
-            BulletView bulletSpawn = _bulletFactory.GetBulletFromPool(transform);
         }
 
         public void FireLaser(out bool canFire)
@@ -168,7 +163,7 @@ namespace Asteroids
 
         public void RequestDeathConditions()
         {
-            _HUDModel.PlayerDead();
+            _hudModel.PlayerDead();
         }
 
         public void RayCastGo(GameObject bound, Transform transform)
@@ -196,11 +191,11 @@ namespace Asteroids
         public void SetPosition(Vector3 pos) => Position = pos;
         public void SetRotation(float rotation) => Rotation = rotation;
 
-        private async void RevivePlayer()
+        private async UniTaskVoid RevivePlayer()
         {
             IsInvincible = true;
             ReviveRequest?.Invoke();
-            await Task.Delay((int)(1000 * InvincibleTime));
+            await UniTask.Delay(TimeSpan.FromSeconds(InvincibleTime));
             IsInvincible = false;
         }
 
@@ -235,10 +230,15 @@ namespace Asteroids
 
         private void UpdateUI()
         {
-            _HUDModel.UpdateRechargeTimer(LaserRechargeTimers.Min());
-            _HUDModel.UpdateCurrentShots(CurrentLaserShots);
-            _HUDModel.UpdateSpeed(CurrentSpeed);
-            _HUDModel.UpdateCoordinates(Position, Rotation);
-        }        
+            _hudModel.UpdateRechargeTimer(LaserRechargeTimers.Min());
+            _hudModel.UpdateCurrentShots(CurrentLaserShots);
+            _hudModel.UpdateSpeed(CurrentSpeed);
+            _hudModel.UpdateCoordinates(Position, Rotation);
+        }
+
+        private void OnReviveHandler()
+        {
+            RevivePlayer().Forget();
+        }
     }
 }

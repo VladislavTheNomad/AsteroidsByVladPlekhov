@@ -1,33 +1,50 @@
+using System;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Firebase;
-using System.Threading.Tasks;
 using Firebase.RemoteConfig;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Zenject;
 
 namespace Asteroids
 {
-    public class ProjectBootstrap : MonoBehaviour
+    public class ProjectBootstrap : IInitializable
     {
         private GameConfigs _gameConfigs;
+        private CloudData _cloudData;
+        private SceneService _sceneService;
 
         [Inject]
-        public void Construct(GameConfigs gameConfigs)
+        public ProjectBootstrap(GameConfigs gameConfigs, CloudData cloudData, SceneService sceneService)
         {
             _gameConfigs = gameConfigs;
+            _cloudData =  cloudData;
+            _sceneService =  sceneService;
+        }
+        
+        public void Initialize()
+        {
+            StartTheGame().Forget();
         }
 
-        private async void Start()
+        private async UniTaskVoid StartTheGame()
         {
-            await InitializeFirebaseAndLoadConfigs();
-            SceneManager.LoadScene("Menu");
+            try
+            {
+                await UniTask.WhenAll(_cloudData.InitCloudDataAsync(), InitializeFirebaseAndLoadConfigs());
+                _sceneService.OpenMenu();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Bootstrap failed: {ex.Message}");
+                _sceneService.OpenMenu();
+            }
         }
 
-        private async Task InitializeFirebaseAndLoadConfigs()
+        private async UniTask InitializeFirebaseAndLoadConfigs()
         {
 
-            DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync();
+            DependencyStatus status = await FirebaseApp.CheckAndFixDependenciesAsync().AsUniTask();
 
             if (status == DependencyStatus.Available)
             {
@@ -40,7 +57,7 @@ namespace Asteroids
             }
         }
 
-        private async Task LoadRemoteConfigs()
+        private async UniTask LoadRemoteConfigs()
         {
             FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.DefaultInstance;
 
@@ -51,13 +68,13 @@ namespace Asteroids
                 { "AsteroidData", json }
             };
 
-            await remoteConfig.SetDefaultsAsync(defaults);
+            await remoteConfig.SetDefaultsAsync(defaults).AsUniTask();
 
-            await remoteConfig.FetchAsync(System.TimeSpan.FromHours(0));
+            await remoteConfig.FetchAsync(System.TimeSpan.FromHours(0)).AsUniTask();
 
             if (remoteConfig.Info.LastFetchStatus == LastFetchStatus.Success)
             {
-                await remoteConfig.ActivateAsync();
+                await remoteConfig.ActivateAsync().AsUniTask();
                 Debug.Log("Remote Config activated.");
             }
             else

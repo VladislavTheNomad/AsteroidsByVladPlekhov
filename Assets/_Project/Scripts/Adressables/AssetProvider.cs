@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -16,32 +17,30 @@ namespace Asteroids
             Unload();
         }
 
-        public T Load<T>(string address) where T : Component
+        public async UniTask<T> Load<T>(string address) where T : Component
         {
             var handle = Addressables.LoadAssetAsync<GameObject>(address);
             _handles.Add(handle);
 
-
-            GameObject prefab = handle.WaitForCompletion();
-
-            if (handle.Status == AsyncOperationStatus.Succeeded)
+            try
             {
-                T component = prefab.GetComponent<T>();
-
-                if(component != null)
+                GameObject prefab = await handle.ToUniTask();
+                
+                if (handle.Status == AsyncOperationStatus.Succeeded)
                 {
-                    return component;
-                }
-                else
-                {
-                    Debug.LogError($"Component: {typeof(T)} not found!");
+                    if (prefab.TryGetComponent(out T component))
+                    {
+                        return component;
+                    }
+                    
+                    Debug.LogError($"Component: {typeof(T)} not found on prefab at {address}!");
                 }
             }
-            else
+            catch (Exception ex)
             {
-                Debug.LogError($"[AddressablesAssetProvider] Failed to load asset at address: {address}");
+                Debug.LogError($"Error loading asset: {ex.Message}");
             }
-
+            
             return null;
         }
 

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3320691949332210882}
   - component: {fileID: 3207100233477476756}
-  - component: {fileID: 1932683537365284547}
+  - component: {fileID: 4560813949115735951}
   m_Layer: 0
   m_Name: ProjectContext
   m_TagString: Untagged
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _scriptableObjectInstallers: []
   _monoInstallers:
-  - {fileID: 1932683537365284547}
+  - {fileID: 4560813949115735951}
   _installerPrefabs: []
   _parentNewObjectsUnderContext: 0
   _editorReflectionBakingCoverageMode: 0
@@ -62,7 +62,7 @@ MonoBehaviour:
       _missingHandlerDefaultResponse: 2
       _requireStrictUnsubscribe: 0
       _defaultAsyncTickPriority: 1
---- !u!114 &1932683537365284547
+--- !u!114 &4560813949115735951
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -74,11 +74,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d45ba36ef41f9934a80d40888538ff0e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _playerConfig: {fileID: 11400000, guid: d118ad50383f7b24ab1f1ec06fb59c6b, type: 2}
-  _bulletConfig: {fileID: 11400000, guid: 3779056d3bb869642b8a78d6bdab5962, type: 2}
-  _asteroidConfig: {fileID: 11400000, guid: f6137251cfdff214ca53137ac53a88ff, type: 2}
-  _ufoConfig: {fileID: 11400000, guid: 3f561bb051ef6a449bab81809e56fe5c, type: 2}
-  _asteroidPrefab: {fileID: 4265792025796565592, guid: 0ed864b98be16a8448933a4cff2f7515, type: 3}
-  _bulletPrefab: {fileID: 2741215976847407681, guid: 3956660c1f071fb459bdce6118f94cd1, type: 3}
-  _ufoPrefab: {fileID: 5821226311079335962, guid: f4f4cf82b36f79741bf5e5ccd0cc9733, type: 3}
-  _poolSize: 10

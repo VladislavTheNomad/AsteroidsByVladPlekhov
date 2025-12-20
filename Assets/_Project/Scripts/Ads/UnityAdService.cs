@@ -23,12 +23,12 @@ namespace Asteroids
         private string _rewardedAdUnitId;
         private string _interstitialAdUnitId;
         private bool _isRewardedReady = false;
-        private StoredDataHandler _saveData;
+        private DataToSave _dataToSave;
 
         [Inject]
-        public void Construct(StoredDataHandler saveData)
+        public void Construct(DataToSave dataToSave)
         {
-            _saveData = saveData;
+            _dataToSave = dataToSave;
         }
 
         public void Initialize()
@@ -67,7 +67,7 @@ namespace Asteroids
 
         public void ShowInterstitialAd(Action onInterstitialComplete)
         {
-            if (_saveData.HasAdBlock)
+            if (_dataToSave._hasAdBlock)
             {
                 onInterstitialComplete?.Invoke();
                 return;
@@ -102,7 +102,7 @@ namespace Asteroids
         {
             if (placementId == _rewardedAdUnitId && showCompletionState == UnityAdsShowCompletionState.COMPLETED)
             {
-                Debug.Log("Rewarded ad completed — grant reward.");
+                Debug.Log("Rewarded ad completed ï¿½ grant reward.");
                 currentRewardCallback?.Invoke();
                 currentRewardCallback = null;
             }

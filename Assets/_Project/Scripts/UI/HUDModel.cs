@@ -1,7 +1,6 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
-using UnityEngine.Events;
 using Zenject;
 
 namespace Asteroids
@@ -41,7 +40,12 @@ namespace Asteroids
             _storedDataHandler.OnSaveScoreAfterDeath += PlayerDeath;
         }        
 
-        public async void Initialize()
+        public void Initialize()
+        {
+            DownloadBestScore().Forget();
+        }
+
+        private async UniTaskVoid DownloadBestScore()
         {
             _currentBestScore = await _storedDataHandler.GetBestScoreAndUpdateData();
             OnBestScoreSetup?.Invoke(_currentBestScore);
@@ -86,7 +90,7 @@ namespace Asteroids
             OnRechargeTimerUpdated?.Invoke(time);
         }
 
-        public async Task PlayerDead()
+        public async UniTask PlayerDead()
         {
             _pauseManager.PauseGameProcess();
             int currentScore = _scoreCounter.GetCurrentScore();
@@ -134,7 +138,7 @@ namespace Asteroids
 
         private void ReloadSessionAfterAd()
         {
-            _sceneService.ReloadGame();
+            _sceneService.StartGame();
         }
 
         private void ContinueSessionAfterAd()
@@ -153,7 +157,7 @@ namespace Asteroids
 
         public void SaveScoreToCloud()
         {
-            _storedDataHandler.SaveToCloud();
+            _storedDataHandler.SaveToCloudAsync();
         }
 
         public int MaxShots => _maxShots;

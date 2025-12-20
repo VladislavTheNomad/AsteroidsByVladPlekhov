@@ -1,10 +1,10 @@
 using System;
-using System.Threading.Tasks;
 using UnityEngine.SceneManagement;
 using Zenject;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+using Cysharp.Threading.Tasks;
 
 namespace Asteroids
 {
@@ -12,32 +12,33 @@ namespace Asteroids
     {
         public event Action OnDownloadRemoteDataCompleted;
         
-        private IStoreService _iapService;
+        private IStoreService _storeService;
         private IAPProductList _productList;
-        private string _labelToDownload = "default";
+        private GlobalAssetCache _globalAssetCache;
         private AsyncOperationHandle _downloadHandle;
+        private string _labelToDownload = "default";
 
         [Inject]
-        public void Construct(IStoreService iapService, IAPProductList productList)
+        public void Construct(IStoreService storeService, IAPProductList productList, GlobalAssetCache globalAssetCache)
         {
-            _iapService = iapService;
+            _storeService = storeService;
             _productList = productList;
+            _globalAssetCache = globalAssetCache;
         }
 
-        public async Task StartDownloadRemoteAddressables()
+        private async UniTask StartDownloadRemoteAddressables()
         {
-            await Addressables.InitializeAsync().Task;
+            await Addressables.InitializeAsync().ToUniTask();
 
             _downloadHandle = Addressables.DownloadDependenciesAsync(_labelToDownload);
 
             try
             {
-                await _downloadHandle.Task;
+                await _downloadHandle.ToUniTask();
 
                 if (_downloadHandle.Status == AsyncOperationStatus.Succeeded)
                 {
                     Debug.Log("Remote Addressables successfully downloaded!");
-                    OnDownloadRemoteDataCompleted?.Invoke();
                 }
                 else
                 {
@@ -46,7 +47,10 @@ namespace Asteroids
             }
             finally
             {
-                Addressables.Release(_downloadHandle);
+                if (_downloadHandle.IsValid())
+                {
+                    Addressables.Release(_downloadHandle);
+                }
             }
         }
 
@@ -55,11 +59,28 @@ namespace Asteroids
             SceneManager.LoadScene("MainScene");
         }
 
-        internal void BuyAdBlock()
+        public void BuyAdBlock()
         {
-            _iapService.BuyProduct(_productList.GetAdBlockKey());
+            _storeService.BuyProduct(_productList.GetAdBlockKey());
         }
 
+        public void OnReadyForDownloads()
+        {
+            LoadAndPrepareGameAssetsAsync().Forget();
+        }
         
+        private async UniTaskVoid LoadAndPrepareGameAssetsAsync()
+        {
+            try
+            {
+                await StartDownloadRemoteAddressables();
+                await _globalAssetCache.LoadGameAssetsAsync();
+                OnDownloadRemoteDataCompleted?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Fatal Error during Asset Loading: {ex}");
+            }
+        }
     }
 }

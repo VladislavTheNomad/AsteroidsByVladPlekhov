@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Zenject;
 
@@ -29,27 +29,36 @@ namespace Asteroids
             _view.Initialize();
             _initialized = true;
 
-            ApplyBehaviour();
+            ApplyBehaviour().Forget();
         }
 
-        public async void ApplyBehaviour()
+        private async UniTaskVoid ApplyBehaviour()
         {
-            while (_view.gameObject.activeSelf)
+            var ct = _view.GetCancellationTokenOnDestroy();
+            
+            try
             {
-                await Task.Delay((int)(_model.GapBetweenPositionChanging * 1000));
-                if (_model.CheckNull(_view.ViewTransform))
+                while (_view.gameObject.activeSelf)
                 {
-                    _model.GetNewDestination(_view.ViewTransform, out Vector3 destination, out float speed);
-                    _view.Move(destination, speed);
+                    await UniTask.Delay(TimeSpan.FromSeconds(_model.GapBetweenPositionChanging), cancellationToken: ct);
+                    if (_model.CheckNull(_view.ViewTransform))
+                    {
+                        _model.GetNewDestination(_view.ViewTransform, out Vector3 destination, out float speed);
+                        _view.Move(destination, speed);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-                else
-                {
-                    break;
-                }
+            }
+            catch (OperationCanceledException)
+            {
+
             }
         }
 
-        public void HandleDeath()
+        private void HandleDeath()
         {
             OnDeathTakeScore?.Invoke(_model.ScorePoints);
             OnDeath?.Invoke();

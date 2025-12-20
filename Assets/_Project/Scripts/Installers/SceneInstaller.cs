@@ -18,27 +18,25 @@ namespace Asteroids
 
         public override void InstallBindings()
         {
-            Container.Bind<IAssetProvider>().To<AssetProvider>().AsSingle().NonLazy();
-            
-            var assetProvider = Container.Resolve<IAssetProvider>();
+            var globalAssetCache = Container.Resolve<GlobalAssetCache>();
 
-            var asteroidView = assetProvider.Load<AsteroidView>(_asteroidPrefabAddress);
-            var bulletView = assetProvider.Load<BulletView>(_bulletPrefabAddress);
-            var ufoView = assetProvider.Load<UfoView>(_ufoPrefabAddress);
+            GameObject astroidPrefab = globalAssetCache.GetAsteroidPrefab();
+            GameObject bulletPrefab = globalAssetCache.GetBulletPrefab();
+            GameObject ufoPrefab = globalAssetCache.GetUFOPrefab();
 
             Container.BindMemoryPool<AsteroidView, MonoMemoryPool<AsteroidView>>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(asteroidView.gameObject).
+                FromComponentInNewPrefab(astroidPrefab).
                 UnderTransformGroup("Asteroids");
 
             Container.BindMemoryPool<BulletView, BulletPool>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(bulletView.gameObject).
+                FromComponentInNewPrefab(bulletPrefab).
                 UnderTransformGroup("Bullets");
 
             Container.BindMemoryPool<UfoView, MonoMemoryPool<UfoView>>().
                 WithInitialSize(_poolSize).
-                FromComponentInNewPrefab(ufoView.gameObject).
+                FromComponentInNewPrefab(ufoPrefab).
                 UnderTransformGroup("UFO's");
 
             Container.Bind<AsteroidFactory>().AsSingle();
@@ -46,7 +44,6 @@ namespace Asteroids
             Container.Bind<UfoFactory>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<SceneService>().AsSingle().NonLazy();
             Container.Bind<Statistics>().AsSingle().NonLazy();
             Container.Bind<IAnalytics>().To<FirebaseAnalyticsService>().AsSingle().NonLazy();
 

@@ -7,13 +7,22 @@ namespace Asteroids
     {
         public override void InstallBindings()
         {
+            Container.BindInterfacesAndSelfTo<ProjectBootstrap>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<SceneService>().AsSingle();
+            Container.BindExecutionOrder<ProjectBootstrap>(-90);
+            
+            Container.Bind<IAssetProvider>().To<AssetProvider>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GlobalAssetCache>().AsSingle();
+            
             Container.BindInterfacesAndSelfTo<CloudData>().AsSingle();
             Container.BindInterfacesAndSelfTo<PauseGame>().AsSingle();
             Container.BindInterfacesAndSelfTo<ScoreCounter>().AsSingle();
             Container.BindInterfacesAndSelfTo<IAPProductList>().AsSingle();
-            Container.BindInterfacesAndSelfTo<IAPService>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<UnityAdService>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<StoredDataHandler>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<IAPService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<UnityAdService>().AsSingle();
+            Container.BindInterfacesAndSelfTo<StoredDataHandler>().AsSingle();
+            Container.BindInterfacesAndSelfTo<StoredDataNames>().AsSingle();
+            Container.BindInterfacesAndSelfTo<DataToSave>().AsSingle();
 
             var configs = new GameConfigs();
             configs.DestructableLayers = LayerMask.GetMask("Enemy");

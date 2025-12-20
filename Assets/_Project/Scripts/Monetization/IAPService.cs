@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Purchasing;
 using Zenject;
@@ -21,7 +22,7 @@ namespace Asteroids
             _productList = productList;
         }
 
-        public async void Initialize()
+        public void Initialize()
         {
             _storeController = UnityIAPServices.StoreController();
 
@@ -30,7 +31,12 @@ namespace Asteroids
             _storeController.OnCheckEntitlement += OnCheckEntitlement;
             _storeController.OnStoreDisconnected += OnStoreDisconnected;
 
-            await _storeController.Connect();
+            StartIAPProcess().Forget();
+        }
+
+        private async UniTaskVoid StartIAPProcess()
+        {
+            await _storeController.Connect().AsUniTask();
 
             _products = _productList.Products;
             Entitlements = new Dictionary<string, bool>();

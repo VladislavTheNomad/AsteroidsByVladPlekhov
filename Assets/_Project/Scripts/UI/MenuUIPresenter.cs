@@ -1,4 +1,6 @@
 using System;
+using System.Threading.Tasks;
+using UnityEngine;
 using Zenject;
 
 namespace Asteroids
@@ -19,8 +21,8 @@ namespace Asteroids
         {
             _uiView.OnGameStartClicked += _uiModel.StartGame;
             _uiView.OnBuyAdBlockClicked += _uiModel.BuyAdBlock;
-            _uiView.OnReadyForDownloads += OnReadyForDownloadsAsync;
-
+            _uiView.OnReadyForDownloads += _uiModel.OnReadyForDownloads;
+            
             _uiModel.OnDownloadRemoteDataCompleted += _uiView.GetAccessToStartButton;
         }
 
@@ -28,14 +30,10 @@ namespace Asteroids
         {
             _uiView.OnGameStartClicked -= _uiModel.StartGame;
             _uiView.OnBuyAdBlockClicked -= _uiModel.BuyAdBlock;
-            _uiView.OnReadyForDownloads -= OnReadyForDownloadsAsync;
+            _uiView.OnReadyForDownloads -= _uiModel.OnReadyForDownloads;
             
             _uiModel.OnDownloadRemoteDataCompleted -= _uiView.GetAccessToStartButton;
         }
-        
-        private async void OnReadyForDownloadsAsync()
-        {
-            await _uiModel.StartDownloadRemoteAddressables();
-        }
+
     }
 }
