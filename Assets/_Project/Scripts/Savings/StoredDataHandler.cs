@@ -22,11 +22,11 @@ namespace Asteroids
 
 
         [Inject]
-        public void Construct(IStoreService storeService, IProductList productList, CloudData cd, StoredDataNames storedDataNames, DataToSave currentData)
+        public void Construct(IStoreService storeService, IProductList productList, CloudData cloudData, StoredDataNames storedDataNames, DataToSave currentData)
         {
             _storeService = storeService;
             _productList = productList;
-            _cloudData = cd;
+            _cloudData = cloudData;
             _storedDataNames = storedDataNames;
             _currentData = currentData;
         }

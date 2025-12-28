@@ -11,7 +11,7 @@ namespace Asteroids
         public event Action OnDeath;
         public event Action<float> OnLifeTimeSpendingFreeze;
 
-        private Rigidbody2D _rb;
+        private Rigidbody2D _rigidBody;
         private bool _isPaused;
         private Vector2 savedLinearVelocity;
         private float savedAngularVelocity;
@@ -31,18 +31,18 @@ namespace Asteroids
 
         public void Initialize()
         {
-            _rb = GetComponent<Rigidbody2D>();
+            _rigidBody = GetComponent<Rigidbody2D>();
         }
 
         public void MoveBullet(float moveSpeed)
         {
-            _rb.AddForce(transform.up * moveSpeed, ForceMode2D.Impulse);
+            _rigidBody.AddForce(transform.up * moveSpeed, ForceMode2D.Impulse);
         }
 
         public void StopBulletMovement()
         {
-            _rb.linearVelocity = Vector2.zero;
-            _rb.angularVelocity = 0f;
+            _rigidBody.linearVelocity = Vector2.zero;
+            _rigidBody.angularVelocity = 0f;
         }
 
         public IEnumerator LifeSpan(float currentLifeTime, float maxLifeTime)
@@ -69,14 +69,14 @@ namespace Asteroids
 
             if(_isPaused)
             {
-                savedLinearVelocity = _rb.linearVelocity;
-                savedAngularVelocity = _rb.angularVelocity;
+                savedLinearVelocity = _rigidBody.linearVelocity;
+                savedAngularVelocity = _rigidBody.angularVelocity;
                 StopBulletMovement();
             }
             else
             {
-                _rb.linearVelocity = savedLinearVelocity;
-                _rb.angularVelocity = savedAngularVelocity;
+                _rigidBody.linearVelocity = savedLinearVelocity;
+                _rigidBody.angularVelocity = savedAngularVelocity;
             }
         }
     }

@@ -6,7 +6,7 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerModel : ITickable, IDisposable
+    public class PlayerModel : ITickable, IInitializable, IDisposable
     {
         private const int SIZE_OF_RAYCASTHITS_ARRAY = 10;
 
@@ -40,20 +40,20 @@ namespace Asteroids
         private float _rechargeBulletTimer = 0f;
 
         [Inject]
-        public PlayerModel(BulletFactory bf, UtilsCalculatePositions utils, HUDModel hudModel, PauseGame pm, RemoteConfigService rcs)
+        public PlayerModel(BulletFactory bulletFactory, UtilsCalculatePositions utils, HUDModel hudModel, PauseGame pauseManager, RemoteConfigService remoteConfigService)
         {
             Position = Vector3.zero;
             Rotation = 0f;
             CurrentSpeed = 0f;
 
-            MovementSpeed = rcs.Config.MovementSpeed;
-            RotationSpeed = rcs.Config.RotationSpeed;
-            BulletRechargeTime = rcs.Config.BulletRechargeTime;
-            LaserRechargeTime = rcs.Config.LaserRechargeTime;
-            DestructableLayers = rcs.Config.DestructableLayers;
-            MaxLaserShots = rcs.Config.MaxLaserShots;
-            LaserDistance = rcs.Config.LaserDistance;
-            InvincibleTime = rcs.Config.InvincibleTime;
+            MovementSpeed = remoteConfigService.Config.MovementSpeed;
+            RotationSpeed = remoteConfigService.Config.RotationSpeed;
+            BulletRechargeTime = remoteConfigService.Config.BulletRechargeTime;
+            LaserRechargeTime = remoteConfigService.Config.LaserRechargeTime;
+            DestructableLayers = remoteConfigService.Config.DestructableLayers;
+            MaxLaserShots = remoteConfigService.Config.MaxLaserShots;
+            LaserDistance = remoteConfigService.Config.LaserDistance;
+            InvincibleTime = remoteConfigService.Config.InvincibleTime;
 
             CurrentLaserShots = MaxLaserShots;
             LaserRechargeTimers = new float[MaxLaserShots];
@@ -63,15 +63,18 @@ namespace Asteroids
                 LaserRechargeTimers[i] = 0f;
             }
 
-            _bulletFactory = bf;
+            _bulletFactory = bulletFactory;
             _utils = utils;
             _hudModel = hudModel;
-            _pauseManager = pm;
-
-            _pauseManager.GameIsPaused += TogglePause;
-            _hudModel.OnRevive += OnReviveHandler;
+            _pauseManager = pauseManager;
 
             _hudModel.SetMaxLaserShots(GetMaxLaserShots());
+        }
+        
+        public void Initialize()
+        {
+            _pauseManager.GameIsPaused += TogglePause;
+            _hudModel.OnRevive += OnReviveHandler;
         }
 
         public void Dispose()
@@ -126,12 +129,11 @@ namespace Asteroids
 
         public void FireBullet(Transform transform)
         {
-            if (!_isBulletRecharging)
-            {
-                _bulletFactory.GetBulletFromPool(transform);
-                BulletFired?.Invoke();
-                _isBulletRecharging = true;
-            }
+            if (_isBulletRecharging) return;
+            
+            _bulletFactory.GetBulletFromPool(transform);
+            BulletFired?.Invoke();
+            _isBulletRecharging = true;
         }
 
         public void FireLaser(out bool canFire)
@@ -230,10 +232,11 @@ namespace Asteroids
 
         private void UpdateUI()
         {
-            _hudModel.UpdateRechargeTimer(LaserRechargeTimers.Min());
+            _hudModel.UpdateUI(LaserRechargeTimers.Min(), CurrentLaserShots, CurrentSpeed, Position, Rotation);
+            /*_hudModel.UpdateRechargeTimer(LaserRechargeTimers.Min());
             _hudModel.UpdateCurrentShots(CurrentLaserShots);
             _hudModel.UpdateSpeed(CurrentSpeed);
-            _hudModel.UpdateCoordinates(Position, Rotation);
+            _hudModel.UpdateCoordinates(Position, Rotation);*/
         }
 
         private void OnReviveHandler()

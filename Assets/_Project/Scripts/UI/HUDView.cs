@@ -1,4 +1,5 @@
 using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -25,8 +26,10 @@ namespace Asteroids
         private UnityAction _onSaveToLocalAction;
         private UnityAction _onSaveToCloudAction;
 
-        [SerializeField] private GameObject _gameOverMenu;
-        [SerializeField] private GameObject _newRecordMenu;
+        [SerializeField] private CanvasGroup _gameOverMenuCanvas;
+        [SerializeField] private CanvasGroup _newRecordMenuCanvas;
+        [SerializeField] private GameObject _gameOverMenuObj;
+        [SerializeField] private GameObject _newRecordMenuObj;
         [SerializeField] private TextMeshProUGUI _coordinatesText;
         [SerializeField] private TextMeshProUGUI _angleText;
         [SerializeField] private TextMeshProUGUI _speedText;
@@ -39,11 +42,14 @@ namespace Asteroids
         [SerializeField] private Button _rewardedAdsButton;
         [SerializeField] private Button _saveToLocalButton;
         [SerializeField] private Button _saveToCloudButton;
+        
+        private Sequence _newRecordSeq;
+        private Sequence _gameOverMenuSeq;
 
         public void Awake()
         {
             _onRewardAction = () => OnRewardedButtonClicked?.Invoke();
-            _onRetryAction = () => OnRetryButtonClicked?.Invoke();
+            _onRetryAction = HideGameOverMenu;
             _onQuitAction = () => OnExitButtonClicked?.Invoke();
             _onSaveToLocalAction = () => OnSaveToLocalClicked?.Invoke();
             _onSaveToCloudAction = () => OnSaveToCloudClicked?.Invoke();
@@ -101,12 +107,38 @@ namespace Asteroids
 
         public void ShowGameOverMenu()
         {
-            _gameOverMenu.SetActive(true);
+            _gameOverMenuCanvas.interactable = false;
+            _gameOverMenuSeq?.Kill();
+            
+            _gameOverMenuObj.SetActive(true);
+            
+            var rectTransform = _gameOverMenuCanvas.transform as RectTransform;
+            if (rectTransform == null) Debug.Log("Cant find rectTransform of gameOverMenu!");
+            
+            rectTransform.anchoredPosition = new Vector2(-100f, 0f);
+
+            _gameOverMenuSeq = DOTween.Sequence()
+                .Append(rectTransform.DOAnchorPosX(110f, 0.3f))
+                .AppendInterval(0.1f)
+                .Append(rectTransform.DOAnchorPosX(-10f, 0.3f))
+                .SetLink(gameObject)
+                .OnComplete(() => _gameOverMenuCanvas.interactable = true);
         }
 
         public void HideGameOverMenu()
         {
-            _gameOverMenu.SetActive(false);
+            _gameOverMenuSeq?.Kill();
+            
+            _gameOverMenuSeq = DOTween.Sequence()
+                .Append(_gameOverMenuCanvas.DOFade(0f, 2f))
+                .Join(_gameOverMenuObj.transform.DOScale(4f, 2f))
+                .SetEase(Ease.OutQuad)
+                .OnComplete(() =>
+                {
+                    _gameOverMenuObj.SetActive(false);
+                    OnRetryButtonClicked?.Invoke();
+                })
+                .SetLink(gameObject);
         }
 
         public void HideRewardButton()
@@ -116,12 +148,39 @@ namespace Asteroids
 
         public void ShowNewRecordUI()
         {
-           _newRecordMenu.SetActive(true);
+            _newRecordMenuCanvas.interactable = false;
+            _newRecordSeq?.Kill();
+            _gameOverMenuSeq?.Kill();
+            
+           _newRecordMenuObj.SetActive(true);
+           
+           var rectTransform = _newRecordMenuCanvas.transform as RectTransform;
+           if (rectTransform == null) Debug.Log("Cant find rectTransform!");
+           
+           rectTransform.anchoredPosition = new Vector2(-100f, 0f);
+               
+           _newRecordSeq = DOTween.Sequence()
+               .Append(rectTransform.DOAnchorPosX(110f, 0.3f))
+               .AppendInterval(0.1f)
+               .Append(rectTransform.DOAnchorPosX(-10f, 0.3f))
+               .SetLink(gameObject)
+               .OnComplete(() => _newRecordMenuCanvas.interactable = true);
         }
 
         public void HideNewRecordUI()
         {
-            _newRecordMenu.SetActive(false);
+            _newRecordSeq?.Kill();
+            _gameOverMenuSeq?.Kill();
+            
+            var rectTransform = _newRecordMenuCanvas.transform as RectTransform;
+            if (rectTransform == null) Debug.Log("Cant find rectTransform!");
+            
+            _newRecordSeq = DOTween.Sequence()
+                .Append(rectTransform.DOAnchorPosX(10f, 0.3f))
+                .AppendInterval(0.1f)
+                .Append(rectTransform.DOAnchorPosX(-110f, 0.3f))
+                .OnComplete(() => _newRecordMenuObj.SetActive(false))
+                .SetLink(gameObject);
         }
 
     }

@@ -15,10 +15,10 @@ namespace Asteroids
         public float CurrentLifetime { get; private set; }
 
         [Inject]
-        public void Construct(BulletModel bm, PauseGame pm)
+        public void Construct(BulletModel bulletModel, PauseGame pauseManager)
         {
-            _model = bm;
-            _pauseManager = pm;
+            _model = bulletModel;
+            _pauseManager = pauseManager;
         }
 
         public void Dispose()

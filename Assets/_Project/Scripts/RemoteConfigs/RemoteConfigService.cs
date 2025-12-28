@@ -14,7 +14,7 @@ namespace Asteroids
             LoadConfigs();
         }
 
-        public void LoadConfigs()
+        private void LoadConfigs()
         {
             string json = FirebaseRemoteConfig.DefaultInstance.GetValue("AsteroidData").StringValue;
             Debug.Log("Raw JSON from Remote Config: " + json);

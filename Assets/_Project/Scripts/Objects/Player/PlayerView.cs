@@ -8,9 +8,10 @@ namespace Asteroids
     [RequireComponent(typeof(LineRenderer), typeof(Rigidbody2D), typeof(Transform))]
     public class PlayerView : MonoBehaviour, IInitializable, IDisposable
     {
-        private const float LASER_WIDTH = 0.2f;
         private const float LASER_DURATION = 0.25f;
         private const float LASER_LENGTH = 20f;
+        
+        [SerializeField] private ParticleSystem _fireBulletParticles;
 
         public event Action MoveRequested;
         public event Action<float> RotateRequested;
@@ -148,13 +149,10 @@ namespace Asteroids
             if (_lineRenderer == null) return;
             StartCoroutine(LaserRoutine());
         }
-
-        public void SetLineRenderer()
+        
+        public void ShowBulletVisual()
         {
-            _lineRenderer.enabled = false;
-            _lineRenderer.positionCount = 2;
-            _lineRenderer.startWidth = LASER_WIDTH;
-            _lineRenderer.endWidth = LASER_WIDTH;
+            _fireBulletParticles.Play();
         }
 
         public void Revive()
@@ -211,5 +209,6 @@ namespace Asteroids
 
             _playerControls.Player.Pause.started -= context => OnPauseClick?.Invoke();
         }
+        
     }
 }

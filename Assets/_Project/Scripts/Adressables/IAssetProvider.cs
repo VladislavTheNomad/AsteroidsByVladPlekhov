@@ -5,7 +5,10 @@ namespace Asteroids
 {
     public interface IAssetProvider
     {
-        UniTask<T> Load<T>(string address) where T : Component;
+        UniTask<T> LoadComponent<T>(string address) where T : Component;
+        
+        UniTask<T> LoadObject<T>(string address) where T : Object;
+        
         void Unload();
     }
 }

@@ -21,15 +21,15 @@ namespace Asteroids
         private bool _isPaused;
 
         [Inject]
-        public void Construct(UtilsCalculatePositions utils, AsteroidFactory af, UfoFactory uf, PauseGame pm, IAnalytics analytics, RemoteConfigService rcs, StoredDataHandler sd)
+        public void Construct(UtilsCalculatePositions utilsMakeRandomStartPosition, AsteroidFactory asteroidFactory, UfoFactory ufoFactory, PauseGame pauseManager, IAnalytics analytics, RemoteConfigService remoteConfigService, StoredDataHandler saveData)
         {
-            _utilsMakeRandomStartPosition = utils;
-            _asteroidFactory = af;
-            _ufoFactory = uf;
-            _pauseManager = pm;
+            _utilsMakeRandomStartPosition = utilsMakeRandomStartPosition;
+            _asteroidFactory = asteroidFactory;
+            _ufoFactory = ufoFactory;
+            _pauseManager = pauseManager;
             _analytics = analytics;
-            _remoteConfigService = rcs;
-            _saveData = sd;
+            _remoteConfigService = remoteConfigService;
+            _saveData = saveData;
         }
 
         public void Initialize()

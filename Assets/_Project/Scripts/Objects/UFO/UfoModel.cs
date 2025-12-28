@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class UfoModel : IDisposable
+    public class UfoModel : IInitializable, IDisposable
     {
         public event Action<bool> IsGamePaused;
 
@@ -14,15 +15,18 @@ namespace Asteroids
         private PlayerView _playerView;
         private PauseGame _pauseManager;
 
-        public UfoModel(RemoteConfigService configService, PlayerView pv, PauseGame pm) 
+        public UfoModel(RemoteConfigService configService, PlayerView playerView, PauseGame pauseManager) 
         {
-            _playerView = pv;
-            _pauseManager = pm;
+            _playerView = playerView;
+            _pauseManager = pauseManager;
 
             ScorePoints = configService.Config.UFOScorePoints;
             MoveSpeed = configService.Config.UFOMoveSpeed;
             GapBetweenPositionChanging = configService.Config.GapBetweenPositionChanging;
-
+        }
+        
+        public void Initialize()
+        {
             _pauseManager.GameIsPaused += TogglePause;
         }
 
@@ -58,5 +62,7 @@ namespace Asteroids
                     break;
             }
         }
+
+      
     }
 }

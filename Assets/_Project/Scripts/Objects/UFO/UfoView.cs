@@ -7,12 +7,14 @@ namespace Asteroids
     [RequireComponent(typeof(Rigidbody2D), typeof(Transform))]
     public class UfoView : MonoBehaviour, IHaveDeathConditions
     {
+        [SerializeField] private ParticleSystem _dyingParticles;
+        
         public event Action OnDeath;
         public event Action OnEnabled;
 
         public Transform ViewTransform { get; private set; }
 
-        private Rigidbody2D _rb;
+        private Rigidbody2D _rigidBody;
         private bool _isPaused;
         private Vector2 savedLinearVelocity;
         private float savedAngularVelocity;
@@ -25,12 +27,12 @@ namespace Asteroids
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.GetComponent<BulletView>()) return;
-            OnDeath?.Invoke();
+            HandleDeath();
         }
 
         public void Initialize()
         {
-            _rb = GetComponent<Rigidbody2D>();
+            _rigidBody = GetComponent<Rigidbody2D>();
             ViewTransform = GetComponent<Transform>();
         }
 
@@ -38,13 +40,15 @@ namespace Asteroids
         {
             if (_isPaused) return;
 
-            _rb.linearVelocity = Vector2.zero;
-            _rb.angularVelocity = 0f;
-            _rb.AddForce(destination * moveSpeed, ForceMode2D.Impulse);
+            _rigidBody.linearVelocity = Vector2.zero;
+            _rigidBody.angularVelocity = 0f;
+            _rigidBody.AddForce(destination * moveSpeed, ForceMode2D.Impulse);
         }
 
         public void HandleDeath()
         {
+            _dyingParticles.transform.parent = null;
+            _dyingParticles.Play();
             OnDeath?.Invoke();
         }
 
@@ -54,15 +58,15 @@ namespace Asteroids
 
             if (_isPaused)
             {
-                savedLinearVelocity = _rb.linearVelocity;
-                savedAngularVelocity = _rb.angularVelocity;
-                _rb.linearVelocity = Vector2.zero;
-                _rb.angularVelocity = 0f;
+                savedLinearVelocity = _rigidBody.linearVelocity;
+                savedAngularVelocity = _rigidBody.angularVelocity;
+                _rigidBody.linearVelocity = Vector2.zero;
+                _rigidBody.angularVelocity = 0f;
             }
             else if(!_isPaused)
             {
-                _rb.linearVelocity = savedLinearVelocity;
-                _rb.angularVelocity = savedAngularVelocity;
+                _rigidBody.linearVelocity = savedLinearVelocity;
+                _rigidBody.angularVelocity = savedAngularVelocity;
             }
         }
     }

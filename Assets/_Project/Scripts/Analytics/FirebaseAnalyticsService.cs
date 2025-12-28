@@ -1,9 +1,10 @@
+using System;
 using Firebase.Analytics;
 using Zenject;
 
 namespace Asteroids
 {
-    public class FirebaseAnalyticsService : IAnalytics
+    public class FirebaseAnalyticsService : IInitializable, IDisposable, IAnalytics
     {
         private Statistics _statistics;
 
@@ -12,6 +13,19 @@ namespace Asteroids
         {
             _statistics = stat;
         }
+        
+        public void Initialize()
+        {
+            _statistics.OnLaserUsed += LogLaserUsed;
+            _statistics.OnGameEnd += LogGameEnd;
+        }
+
+        public void Dispose()
+        {
+            _statistics.OnLaserUsed -= LogLaserUsed;
+            _statistics.OnGameEnd -= LogGameEnd;
+        }
+        
         public void LogGameEnd()
         {
             Parameter[] parameters =
@@ -34,5 +48,7 @@ namespace Asteroids
         {
             FirebaseAnalytics.LogEvent("laser_used");
         }
+
+        
     }
 }

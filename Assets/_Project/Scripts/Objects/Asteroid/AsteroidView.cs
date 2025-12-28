@@ -6,6 +6,8 @@ namespace Asteroids
     [RequireComponent(typeof(Rigidbody2D), typeof(Transform))]
     public class AsteroidView : MonoBehaviour, IHaveDeathConditions
     {
+        [SerializeField] private ParticleSystem _dyingParticles;
+        
         public event Action OnDeath;
         public event Action OnMovement;
         public event Action OnEnabled;
@@ -27,7 +29,7 @@ namespace Asteroids
         private void OnTriggerEnter2D(Collider2D other)
         {
             if (!other.TryGetComponent<BulletView>(out BulletView bv)) return;
-            OnDeath?.Invoke();
+            HandleDeath();
         }
 
         private void Update()
@@ -79,6 +81,8 @@ namespace Asteroids
 
         public void HandleDeath()
         {
+            _dyingParticles.transform.parent = null;
+            _dyingParticles.Play();
             OnDeath?.Invoke();
         }
 

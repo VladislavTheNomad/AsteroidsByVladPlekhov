@@ -1,9 +1,10 @@
 using System;
 using UnityEngine;
+using Zenject;
 
 namespace Asteroids
 {
-    public class AsteroidModel
+    public class AsteroidModel : IInitializable, IDisposable
     {
         private const float SCALE_REDUCE = 0.5f;
 
@@ -23,7 +24,7 @@ namespace Asteroids
         private Vector3 _bottomLeft;
         private Vector3 _topRight;
 
-        public AsteroidModel(RemoteConfigService configService, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseGame pm)
+        public AsteroidModel(RemoteConfigService configService, Camera camera, UtilsCalculatePositions utils, AsteroidFactory factory, PauseGame pauseMenu)
         {
             MaxMoveSpeed = configService.Config.MaxMoveSpeed;
             MinMoveSpeed = configService.Config.MinMoveSpeed;
@@ -35,12 +36,20 @@ namespace Asteroids
             _mainCamera = camera;
             _utils = utils;
             _factory = factory;
-            _pauseManager = pm;
+            _pauseManager = pauseMenu;
+        }
 
+        public void Initialize()
+        {
+            _pauseManager.GameIsPaused += TogglePause;
+            
             _bottomLeft = _mainCamera.ViewportToWorldPoint(Vector2.zero);
             _topRight = _mainCamera.ViewportToWorldPoint(Vector2.one);
-
-            _pauseManager.GameIsPaused += TogglePause;
+        }
+        
+        public void Dispose()
+        {
+            _pauseManager.GameIsPaused -= TogglePause;
         }
 
         public Vector3 CheckBounds(Transform transform)
@@ -96,5 +105,6 @@ namespace Asteroids
                     break;
             }
         }
+
     }
 }

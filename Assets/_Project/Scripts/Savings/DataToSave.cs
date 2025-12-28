@@ -8,12 +8,5 @@ namespace Asteroids
         public int _bestScore;
         public string _saveDate;
         public bool _hasAdBlock;
-
-        public DataToSave()
-        {
-            _bestScore = 0;
-            _saveDate = "";
-            _hasAdBlock = false;
-        }
     }
 }

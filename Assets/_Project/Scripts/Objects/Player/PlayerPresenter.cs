@@ -4,7 +4,7 @@ using Zenject;
 
 namespace Asteroids
 {
-    public class PlayerPresenter : IHaveDeathConditions, ILateTickable, IDisposable
+    public class PlayerPresenter : IHaveDeathConditions, ILateTickable, IInitializable, IDisposable
     {
         private PlayerModel _model;
         private PlayerView _view;
@@ -15,7 +15,10 @@ namespace Asteroids
         {
             _model = playerModel;
             _view = playerView;
-
+        }
+        
+        public void Initialize()
+        {
             _view.MoveRequested += AddMove;
             _view.RotateRequested += AddTorque;
             _view.FireBulletRequested += FireBullet;
@@ -25,6 +28,7 @@ namespace Asteroids
 
             _model.IsGamePaused += PausePlayer;
             _model.ReviveRequest += RevivePlayer;
+            _model.BulletFired += _view.ShowBulletVisual;
         }
 
         public void LateTick()
@@ -117,6 +121,8 @@ namespace Asteroids
             _view.OnPauseClick -= _model.PauseGame;
 
             _model.IsGamePaused -= PausePlayer;
+            _model.ReviveRequest -= RevivePlayer;
+            _model.BulletFired -= _view.ShowBulletVisual;
         }
     }
 }

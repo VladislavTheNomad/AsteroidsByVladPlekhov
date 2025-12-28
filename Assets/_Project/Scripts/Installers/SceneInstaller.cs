@@ -10,10 +10,7 @@ namespace Asteroids
         [SerializeField] private GameProcessStarter _gameProcessStarter;
         [SerializeField] private Camera _camera;
         [SerializeField] private PlayerView _playerView;
-
-        [SerializeField] private string _asteroidPrefabAddress = "Asteroid";
-        [SerializeField] private string _bulletPrefabAddress = "Bullet";
-        [SerializeField] private string _ufoPrefabAddress = "Ufo";
+        [SerializeField] private SoundService _soundService;
         [SerializeField] private int _poolSize;
 
         public override void InstallBindings()
@@ -43,9 +40,9 @@ namespace Asteroids
             Container.Bind<BulletFactory>().AsSingle();
             Container.Bind<UfoFactory>().AsSingle();
 
-            Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle().NonLazy();
-            Container.Bind<Statistics>().AsSingle().NonLazy();
-            Container.Bind<IAnalytics>().To<FirebaseAnalyticsService>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<UtilsCalculatePositions>().AsSingle();
+            Container.BindInterfacesAndSelfTo<Statistics>().AsSingle();
+            Container.Bind<IAnalytics>().To<FirebaseAnalyticsService>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<HUDModel>().AsSingle().NonLazy();
             Container.BindInterfacesAndSelfTo<PlayerModel>().AsSingle().NonLazy();
@@ -56,13 +53,14 @@ namespace Asteroids
             Container.BindInterfacesAndSelfTo<AsteroidPresenter>().AsTransient();
             Container.BindInterfacesAndSelfTo<UfoPresenter>().AsTransient();
             Container.BindInterfacesAndSelfTo<BulletPresenter>().AsTransient();
-            Container.BindInterfacesAndSelfTo<PlayerPresenter>().AsSingle().NonLazy();
-            Container.BindInterfacesAndSelfTo<HUDPresenter>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerPresenter>().AsSingle();
+            Container.BindInterfacesAndSelfTo<HUDPresenter>().AsSingle();
 
             Container.BindInterfacesAndSelfTo<HUDView>().FromInstance(_HUDView).AsSingle();
             Container.BindInterfacesAndSelfTo<GameProcessStarter>().FromInstance(_gameProcessStarter).AsSingle();
-            Container.BindInterfacesAndSelfTo<PlayerView>().FromInstance(_playerView).AsSingle().NonLazy();
-            Container.Bind<Camera>().FromInstance(_camera).AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<PlayerView>().FromInstance(_playerView).AsSingle();
+            Container.BindInterfacesAndSelfTo<SoundService>().FromInstance(_soundService).AsSingle();
+            Container.Bind<Camera>().FromInstance(_camera).AsSingle();
         }
     }
 }
